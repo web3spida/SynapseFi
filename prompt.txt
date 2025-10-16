@@ -1,0 +1,219 @@
+Perfect — you’re going for a **Wave 1 build prompt** that delivers a premium, VC-level visual and technical experience with **no backend**, where the **frontend directly interacts with the smart contract** on **Polygon zkEVM**.
+
+Below is a **detailed prompt** you can paste directly into a coding AI (like Claude, Cursor, or Replit AI) to **generate and run your Wave 1 implementation** for **SynapseFi**.
+
+---
+
+## 🧾 Prompt: Wave 1 Implementation (Frontend + Smart Contract Integration)
+
+**Objective:**
+Implement **Wave 1** of SynapseFi — the foundation layer integrating the **smart contract** with a **frontend** that interacts directly with the blockchain (Polygon zkEVM) **without any backend services**.
+The focus is on **smart contract deployment**, **wallet connection**, and a **premium-grade UI** that reflects a **$5M design aesthetic**.
+
+---
+
+### **Prompt to Give the AI Coder**
+
+You are building **Wave 1 (Foundation Phase)** for **SynapseFi**, an AI-powered on-chain credit and risk intelligence network on **Polygon zkEVM**.
+
+Follow these exact specifications:
+
+---
+
+### **1. Technical Stack**
+
+* **Frontend Framework:** React + Vite
+* **Language:** TypeScript
+* **Styling:** TailwindCSS + Framer Motion for animations
+* **Blockchain Interaction:** wagmi + viem + ethers.js
+* **Wallet Integration:** RainbowKit
+* **Smart Contract Language:** Solidity
+* **Network:** Polygon zkEVM Testnet
+* **Contract Deployment:** Hardhat
+
+No backend should be used.
+All blockchain interactions must occur directly from the frontend using wagmi hooks or ethers.js calls.
+
+---
+
+### **2. Smart Contract Requirements**
+
+Create two contracts:
+
+#### a. `CreditPassport.sol`
+
+* SPDX License Identifier: MIT
+* Solidity version: ^0.8.20
+* Features:
+
+  * Struct `UserScore` with fields:
+
+    * `address user`
+    * `uint256 score`
+    * `uint256 lastUpdated`
+  * Mapping from user address to `UserScore`
+  * Function `updateScore(address user, uint256 score)` callable by owner
+  * Function `getScore(address user)` returns current score and timestamp
+* Emit an event `ScoreUpdated(address indexed user, uint256 score, uint256 timestamp)`
+* Use **Ownable** from OpenZeppelin.
+
+#### b. `SynapseToken.sol`
+
+* A simple ERC20 token named “Synapse Token” with symbol “SYN”.
+* Mint initial supply to the deployer.
+* Used later for staking and governance (placeholder for now).
+
+Deploy both contracts to the **Polygon zkEVM Testnet** using **Hardhat**.
+
+---
+
+### **3. Frontend UI Specifications**
+
+#### **General Design System**
+
+use React+vite for the frontend
+
+* **Theme:** Black background (`#000000`)
+* **Accent Color:** Deep purple (`#7B2CBF`)
+* **Text Color:** White (`#FFFFFF`)
+* **Typography:** Use **Poppins** and **Inter**
+* **Layout Style:** Minimalist, futuristic, premium aesthetic
+* **Buttons:** Rounded-2xl, glowing hover effects with purple gradients
+* **Cards:** Soft shadows, blurred glassmorphism feel
+* **Animation:** Use Framer Motion for smooth transitions (fade, slide, scale)
+* **Icons:** Use `lucide-react` for clean and modern vector icons.
+
+#### **Page Layouts**
+
+##### **A. Landing Page**
+
+* Header:
+
+  * Logo (SynapseFi text in gradient purple)
+  * Nav items: “Dashboard”, “Docs”, “Connect Wallet”
+  * Wallet connection via **RainbowKit**
+* Hero Section:
+
+  * Left: Bold heading “AI-Powered Credit for the Decentralized Economy”
+  * Subtext: “Predict creditworthiness. Secure DeFi trust. Powered by Polygon zkEVM.”
+  * CTA Button: “Launch Dashboard” → links to dashboard route
+  * Background: Animated gradient waves in purple shades
+  * Subtle particle animation behind hero section
+* Footer:
+
+  * Polygon logo + “Built for the Polygon Buildathon”
+
+##### **B. Dashboard Page**
+
+* Wallet must be connected to view.
+* Display the following:
+
+  * Connected wallet address (shortened)
+  * Current credit score fetched from the smart contract
+  * Timestamp of last update
+  * Animated card component showing score visually (e.g., circular gradient progress ring)
+* Button: “Update My Score” (calls `updateScore()` on contract for testing)
+* Button: “Refresh” (calls `getScore()` again)
+* Success and error toasts via shadcn/ui or react-hot-toast
+* Include a minimal sidebar with icons:
+
+  * Dashboard
+  * My Passport
+  * Governance (disabled placeholder)
+* Ensure all components use the black–purple–white color palette.
+
+##### **C. Credit Passport Card**
+
+* Gradient border (purple)
+* Glass-style background
+* Shows:
+
+  * Wallet address (shortened)
+  * Score value
+  * Score tier (Low / Medium / High Risk)
+  * Last updated date
+* Animate the score circle to fill up dynamically.
+
+---
+
+### **4. Smart Contract Interaction**
+
+Use **wagmi** hooks for all contract calls.
+Examples:
+
+```typescript
+const { data: score } = useContractRead({
+  address: "CREDIT_PASSPORT_CONTRACT_ADDRESS",
+  abi: CreditPassportABI,
+  functionName: "getScore",
+  args: [address],
+});
+
+const { write: updateScore } = useContractWrite({
+  address: "CREDIT_PASSPORT_CONTRACT_ADDRESS",
+  abi: CreditPassportABI,
+  functionName: "updateScore",
+});
+```
+
+Display loading states and toast notifications for transactions.
+
+---
+
+### **5. File Structure**
+
+```
+synapsefi/
+├── contracts/
+│   ├── CreditPassport.sol
+│   ├── SynapseToken.sol
+│   └── hardhat.config.js
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── styles/
+│   │   └── utils/
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+```
+
+---
+
+### **6. Design Quality Expectations**
+
+This UI must look like a high-end, venture-ready product:
+
+* No default UI components — all should be custom, sleek, and highly aesthetic.
+* Use **blurred glass backgrounds** and **neon purple accent effects** for contrast.
+* Apply micro-interactions (hover glow, button scaling, fade transitions).
+* Keep UI spacing clean and grid-aligned.
+* Include a small animated loading ring when fetching on-chain data.
+* Add subtle background ambient animation to give the dashboard a premium, alive feeling.
+
+---
+
+### **7. Deliverables for Wave 1**
+
+* Deployed smart contracts on Polygon zkEVM testnet (with verified addresses).
+* React frontend connected directly to the contracts using wagmi.
+* Working wallet connection and score fetching/updating.
+* Fully styled landing page and dashboard with black–purple premium design.
+setup deployment for netlify
+* README.md file with setup instructions and contract addresses.
+
+---
+
+### **8. Bonus Enhancements (Optional if Time Allows)**
+
+* Implement dynamic scoring visualization (gradient-filled circular chart).
+* Add a “Simulate Risk” button that randomly updates the score (for demo purposes).
+* Animate the background gradient waves using Framer Motion’s keyframes.
+
+---
+
+### **Expected Outcome**
+
+A fully functional **SynapseFi MVP interface** directly integrated with the deployed smart contract, reflecting a **futuristic black-and-purple DeFi design**, smooth user experience, and investor-grade visual polish — ready for Buildathon demos and Polygon ecosystem showcasing.
