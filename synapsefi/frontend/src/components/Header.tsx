@@ -1,10 +1,10 @@
-import React from 'react';
+import type { FC } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CreditCard, FileText, BarChart3 } from 'lucide-react';
 
-export const Header: React.FC = () => {
+export const Header: FC = () => {
   const location = useLocation();
 
   const navItems = [
@@ -35,15 +35,17 @@ export const Header: React.FC = () => {
             </motion.div>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8" aria-label="Main Navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = location.pathname === item.path;
               return (
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-                    location.pathname === item.path
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
+                    isActive
                       ? 'bg-purple-500/20 text-purple-400'
                       : 'text-gray-400 hover:text-purple-400 hover:bg-purple-500/10'
                   }`}

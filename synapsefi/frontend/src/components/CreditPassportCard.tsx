@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import { motion } from 'framer-motion';
 import { formatAddress, getScoreTier } from '../utils/constants';
 
@@ -9,14 +9,14 @@ interface CreditPassportCardProps {
   isLoading?: boolean;
 }
 
-export const CreditPassportCard: React.FC<CreditPassportCardProps> = ({
+export const CreditPassportCard: FC<CreditPassportCardProps> = ({
   address,
   score,
   lastUpdated,
   isLoading = false,
 }) => {
   const { tier, color, risk } = getScoreTier(score);
-  const progress = (score / 850) * 100;
+  const progress = Math.max(0, Math.min(100, (score / 850) * 100));
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleDateString('en-US', {
@@ -48,9 +48,9 @@ export const CreditPassportCard: React.FC<CreditPassportCardProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-center mb-6">
+        <div className="flex items-center justify-center mb-6" aria-label="Credit score gauge">
           <div className="relative w-32 h-32">
-            <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+            <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120" role="img" aria-label={`Score progress ${Math.round(progress)}%`}>
               <circle
                 cx="60"
                 cy="60"
@@ -72,7 +72,7 @@ export const CreditPassportCard: React.FC<CreditPassportCardProps> = ({
                   strokeDasharray: `${progress * 3.39} 339`,
                   strokeDashoffset: 0
                 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -80,9 +80,13 @@ export const CreditPassportCard: React.FC<CreditPassportCardProps> = ({
                 className="text-3xl font-bold text-white"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.4 }}
               >
-                {isLoading ? '...' : score}
+                {isLoading ? (
+                  <span className="inline-block w-12 h-7 rounded bg-gray-700 animate-pulse" />
+                ) : (
+                  score
+                )}
               </motion.span>
               <span className="text-gray-400 text-sm">Score</span>
             </div>
@@ -98,6 +102,7 @@ export const CreditPassportCard: React.FC<CreditPassportCardProps> = ({
                 backgroundColor: `${color}20`,
                 color: color
               }}
+              aria-label={`Risk tier: ${risk}`}
             >
               {risk} Risk
             </span>

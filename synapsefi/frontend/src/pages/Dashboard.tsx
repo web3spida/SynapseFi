@@ -1,25 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { FC } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Header } from '../components/Header';
 import { CreditPassportCard } from '../components/CreditPassportCard';
 import { CREDIT_PASSPORT_ABI } from '../utils/abis';
-import { CONTRACT_ADDRESSES } from '../utils/constants';
+import { CONTRACT_ADDRESSES, ZERO_ADDRESS } from '../utils/constants';
 import { formatAddress } from '../utils/constants';
 import { RefreshCw, Settings, User, BarChart3 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useMemo } from 'react';
 
-export const Dashboard: React.FC = () => {
+export const Dashboard: FC = () => {
   const { address, isConnected } = useAccount();
   const [score, setScore] = useState<number>(650);
   const [lastUpdated, setLastUpdated] = useState<number>(Math.floor(Date.now() / 1000));
   
-  const { data: scoreData, refetch: refetchScore, isLoading: isReading } = useReadContract({
+  const isContractConfigured = useMemo(() => (
+    CONTRACT_ADDRESSES.CREDIT_PASSPORT !== ZERO_ADDRESS
+  ), [])
+  
+  const { data: scoreData, refetch, isLoading: isReading } = useReadContract({
     address: CONTRACT_ADDRESSES.CREDIT_PASSPORT as `0x${string}`,
     abi: CREDIT_PASSPORT_ABI,
     functionName: 'getScore',
-    args: address ? [address] : undefined,
-    enabled: !!address,
+    args: [address!],
+    query: { enabled: !!address && isContractConfigured },
   });
 
   const { writeContract: updateScore, isPending: isWriting, data: txHash } = useWriteContract();
@@ -36,31 +42,42 @@ export const Dashboard: React.FC = () => {
     }
   }, [scoreData]);
 
+  useEffect(() => {
+    if (!isConfirming && txHash) {
+      // After confirmation, refresh to get latest on-chain score
+      refetch();
+    }
+  }, [isConfirming, txHash, refetch]);
+
   const handleUpdateScore = async () => {
     if (!address) {
       toast.error('Please connect your wallet');
       return;
     }
 
+    if (!isContractConfigured) {
+      toast.error('Contract address is not configured');
+      return;
+    }
+
     try {
       const newScore = Math.floor(Math.random() * 300) + 550; // Random score between 550-850
-      
       await updateScore({
         address: CONTRACT_ADDRESSES.CREDIT_PASSPORT as `0x${string}`,
         abi: CREDIT_PASSPORT_ABI,
         functionName: 'updateScore',
         args: [address, BigInt(newScore)],
       });
-      
       toast.success('Score update submitted!');
     } catch (error) {
       console.error('Error updating score:', error);
-      toast.error('Failed to update score');
+      const message = (error as Error)?.message ?? 'Failed to update score';
+      toast.error(message);
     }
   };
 
   const handleRefresh = () => {
-    refetchScore();
+    refetch();
     toast.success('Score refreshed!');
   };
 
@@ -105,7 +122,7 @@ export const Dashboard: React.FC = () => {
           className="w-64 bg-gray-900/50 backdrop-blur-lg border-r border-purple-500/20 p-6"
         >
           <div className="space-y-2">
-            {sidebarItems.map((item, index) => (
+            {sidebarItems.map((item) => (
               <motion.div
                 key={item.label}
                 whileHover={{ scale: item.disabled ? 1 : 1.02 }}
@@ -142,14 +159,14 @@ export const Dashboard: React.FC = () => {
           >
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
-              <p className="text-gray-400">Welcome back, {formatAddress(address)}</p>
+              <p className="text-gray-400">Welcome back, {formatAddress(address || '')}</p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Credit Passport Card */}
               <div>
                 <CreditPassportCard
-                  address={address}
+                  address={address || ''}
                   score={score}
                   lastUpdated={lastUpdated}
                   isLoading={isReading}
@@ -172,6 +189,7 @@ export const Dashboard: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={handleUpdateScore}
                       disabled={isWriting || isConfirming}
+                      aria-disabled={isWriting || isConfirming}
                       className="w-full bg-gradient-to-r from-purple-600 to-purple-400 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isWriting || isConfirming ? (
@@ -189,6 +207,7 @@ export const Dashboard: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={handleRefresh}
                       disabled={isReading}
+                      aria-disabled={isReading}
                       className="w-full bg-gray-800/50 text-white px-6 py-3 rounded-xl font-medium border border-gray-700 hover:border-purple-500/40 transition-all duration-300 disabled:opacity-50"
                     >
                       <span className="flex items-center justify-center space-x-2">

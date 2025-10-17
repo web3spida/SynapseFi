@@ -1,10 +1,10 @@
-import React from 'react';
+import type { FC } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { ArrowRight, Zap, Shield, TrendingUp } from 'lucide-react';
 
-export const LandingPage: React.FC = () => {
+export const LandingPage: FC = () => {
   const features = [
     {
       icon: Zap,

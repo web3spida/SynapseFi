@@ -1,41 +1,47 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi';
-import { polygonZkEvmTestnet } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
-import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import '@rainbow-me/rainbowkit/styles.css';
-import './styles/globals.css';
-import './styles/animations.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { WagmiConfig } from 'wagmi'
+import { polygonZkEvmCardona } from 'wagmi/chains'
+import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import '@rainbow-me/rainbowkit/styles.css'
+import './styles/globals.css'
+import './styles/animations.css'
 
-import { LandingPage } from './pages/LandingPage';
-import { Dashboard } from './pages/Dashboard';
+import { LandingPage } from './pages/LandingPage'
+import { Dashboard } from './pages/Dashboard'
 
-const { chains, publicClient } = configureChains(
-  [polygonZkEvmTestnet],
-  [publicProvider()]
-);
+const projectId = import.meta.env.VITE_WC_PROJECT_ID as string | undefined
 
-const { connectors } = getDefaultWallets({
+const config = getDefaultConfig({
   appName: 'SynapseFi',
-  projectId: 'synapsefi-credit-protocol',
-  chains,
-});
+  projectId: projectId || '00000000000000000000000000000000',
+  chains: [polygonZkEvmCardona],
+  ssr: false,
+})
 
-const config = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
-
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+      retry: 2,
+    },
+  },
+})
 
 function App() {
   return (
     <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider chains={chains}>
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: '#8B5CF6',
+            borderRadius: 'medium',
+            fontStack: 'system',
+            overlayBlur: 'small',
+          })}
+          modalSize="compact"
+        >
           <Router>
             <div className="min-h-screen bg-black text-white">
               <Routes>
@@ -47,7 +53,7 @@ function App() {
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiConfig>
-  );
+  )
 }
 
-export default App;
+export default App
