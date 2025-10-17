@@ -34,6 +34,10 @@ const fixImportAttrRollup = {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [fixImportAttrRollup, react()],
+  define: {
+    // Polyfill process.env for libraries that expect Node globals (e.g., matic.js)
+    'process.env': {},
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
