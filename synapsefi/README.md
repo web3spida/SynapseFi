@@ -22,14 +22,14 @@ A premium DeFi application that provides AI-powered on-chain credit scoring and 
 ### Smart Contracts
 - **Language**: Solidity ^0.8.20
 - **Framework**: Hardhat
-- **Network**: Polygon zkEVM Cardona Testnet
+- **Network**: Polygon Amoy Testnet (PoS)
 - **Libraries**: OpenZeppelin Contracts
 
 ## 📋 Prerequisites
 
 - Node.js (v16 or higher)
 - MetaMask or compatible wallet
-- Polygon zkEVM Cardona Testnet configuration
+- Polygon Amoy Testnet configuration
 
 ## 🚀 Quick Start
 
@@ -50,8 +50,8 @@ npm install
 Create `.env` file based on `.env.example`:
 ```env
 PRIVATE_KEY=your_private_key
-POLYGON_ZKEVM_RPC_URL=https://rpc.cardona.zkevm-rpc.com
-ETHERSCAN_API_KEY=your_etherscan_api_key
+POLYGON_AMOY_RPC_URL=https://rpc-amoy.polygon.technology
+POLYGONSCAN_API_KEY=your_polygonscan_api_key
 ```
 
 Deploy contracts:
@@ -86,7 +86,7 @@ npm run dev
 3. **Update Score**: Use "Update My Score" button for testing
 4. **Monitor Changes**: Real-time updates with visual feedback
 
-## 🎯 Contract Addresses (Polygon zkEVM Testnet)
+## 🎯 Contract Addresses (Polygon Amoy Testnet)
 
 *Note: Replace with your actual deployed addresses*
 
@@ -110,15 +110,15 @@ npm run dev
 
 ### Contracts
 - `npm run compile` - Compile contracts
-- `npm run deploy` - Deploy to Polygon zkEVM Testnet
+- `npm run deploy` - Deploy to Polygon Amoy Testnet
 - `npm run verify` - Verify contracts on block explorer
 
 ## 🌐 Network Configuration
 
-**Polygon zkEVM Cardona Testnet**
-- Chain ID: 2442
-- RPC URL: https://rpc.cardona.zkevm-rpc.com
-- Explorer: https://cardona-zkevm.polygonscan.com
+**Polygon Amoy Testnet (PoS)**
+- Chain ID: 80002
+- RPC URL: https://rpc-amoy.polygon.technology
+- Explorer: https://amoy.polygonscan.com
 
 ## 🤝 Contributing
 

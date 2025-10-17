@@ -5,7 +5,7 @@ import { ethers } from 'ethers'
 use(EthersPlugin)
 
 export type PolygonNetwork = 'mainnet' | 'testnet'
-export type PolygonVersion = 'v1' | 'v2' | 'mumbai'
+export type PolygonVersion = 'v1' | 'v2' | 'mumbai' | 'amoy'
 
 export interface PolygonConfigOptions {
   network?: PolygonNetwork
@@ -17,7 +17,7 @@ let posClient: POSClient | null = null
 
 export const initPOSClient = async (opts: PolygonConfigOptions = {}) => {
   const network: PolygonNetwork = (import.meta.env.VITE_POLYGON_NETWORK as PolygonNetwork) || opts.network || 'testnet'
-  const version: PolygonVersion = (import.meta.env.VITE_POLYGON_VERSION as PolygonVersion) || opts.version || 'v1'
+  const version: PolygonVersion = (import.meta.env.VITE_POLYGON_VERSION as PolygonVersion) || opts.version || 'amoy'
 
   const ethereumProvider = (window as any).ethereum
   if (!ethereumProvider) {

@@ -1,16 +1,16 @@
 import type { Chain } from 'viem'
 
-export const polygonZkEvmCardona: Chain = {
-  id: 2442,
-  name: 'Polygon zkEVM Cardona Testnet',
-  network: 'polygon-zkevm-cardona',
-  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+export const polygonAmoy: Chain = {
+  id: 80002,
+  name: 'Polygon Amoy',
+  network: 'polygon-amoy',
+  nativeCurrency: { name: 'Polygon', symbol: 'POL', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://rpc.cardona.zkevm-rpc.com'] },
-    public: { http: ['https://rpc.cardona.zkevm-rpc.com'] },
+    default: { http: ['https://rpc-amoy.polygon.technology'] },
+    public: { http: ['https://rpc-amoy.polygon.technology'] },
   },
   blockExplorers: {
-    default: { name: 'Polygonscan', url: 'https://cardona-zkevm.polygonscan.com' },
+    default: { name: 'Polygonscan', url: 'https://amoy.polygonscan.com' },
   },
   testnet: true,
 }
