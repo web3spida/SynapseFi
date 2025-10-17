@@ -1,5 +1,5 @@
 import { POSClient, use, setProofApi } from '@maticnetwork/maticjs'
-import { EthersPlugin } from '@maticnetwork/maticjs-ethers'
+import EthersPlugin from '@maticnetwork/maticjs-ethers'
 import { ethers } from 'ethers'
 
 use(EthersPlugin)
@@ -59,20 +59,20 @@ export const getPOSClient = () => {
 // Example helpers for ERC20 operations on PoS bridge
 export const depositERC20ForUser = async (tokenAddress: string, amountWei: string, userAddress: string) => {
   const client = getPOSClient()
-  const erc20 = client.erc20(tokenAddress, false) // false => parent chain token
-  const tx = await erc20.depositFor(userAddress, amountWei)
+  const erc20 = client.erc20(tokenAddress, false) as any // false => parent chain token
+  const tx = await erc20.deposit(amountWei, userAddress)
   return tx.getReceipt()
 }
 
 export const withdrawERC20 = async (tokenAddress: string, amountWei: string) => {
   const client = getPOSClient()
-  const erc20 = client.erc20(tokenAddress, true) // true => child chain token
-  const tx = await erc20.withdraw(amountWei)
+  const erc20 = client.erc20(tokenAddress, true) as any // true => child chain token
+  const tx = await erc20.withdrawStart(amountWei)
   return tx.getReceipt()
 }
 
 export const balanceOfChildERC20 = async (tokenAddress: string, userAddress: string) => {
   const client = getPOSClient()
-  const erc20 = client.erc20(tokenAddress, true)
-  return erc20.balanceOf(userAddress)
+  const erc20 = client.erc20(tokenAddress, true) as any
+  return erc20.getBalance(userAddress)
 }
