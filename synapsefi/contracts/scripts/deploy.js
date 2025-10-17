@@ -15,7 +15,7 @@ async function main() {
 
   // Deploy CreditPassport
   const CreditPassport = await ethers.getContractFactory("CreditPassport");
-  const creditPassport = await CreditPassport.deploy(synapseTokenAddress);
+  const creditPassport = await CreditPassport.deploy();
   await creditPassport.waitForDeployment();
   const creditPassportAddress = await creditPassport.getAddress();
   console.log("CreditPassport deployed at:", creditPassportAddress);
@@ -29,7 +29,6 @@ async function main() {
     },
     creditPassport: {
       address: creditPassportAddress,
-      token: synapseTokenAddress,
     },
     timestamp: new Date().toISOString()
   };

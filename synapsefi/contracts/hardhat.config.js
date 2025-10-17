@@ -12,6 +12,9 @@ module.exports = {
       }
     }
   },
+  paths: {
+    sources: "contracts",
+  },
   networks: {
     polygonZkevmTestnet: {
       url: process.env.POLYGON_ZKEVM_RPC_URL || "https://rpc.cardona.zkevm-rpc.com",
@@ -23,7 +26,9 @@ module.exports = {
       url: process.env.POLYGON_AMOY_RPC_URL || "https://rpc-amoy.polygon.technology",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 80002,
-      gasPrice: 1000000000, // 1 gwei
+      // Amoy requires a minimum priority fee; set EIP-1559 params
+      maxPriorityFeePerGas: 25000000000, // 25 gwei
+      maxFeePerGas: 50000000000, // 50 gwei
     },
     hardhat: {
       chainId: 1337
