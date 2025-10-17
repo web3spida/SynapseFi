@@ -10,6 +10,7 @@ import { formatAddress } from '../utils/constants';
 import { RefreshCw, Settings, User, BarChart3 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useMemo } from 'react';
+import { BridgePanel } from '../components/BridgePanel';
 
 export const Dashboard: FC = () => {
   const { address, isConnected } = useAccount();
@@ -217,6 +218,9 @@ export const Dashboard: FC = () => {
                     </motion.button>
                   </div>
                 </motion.div>
+
+                {/* Bridge Panel */}
+                <BridgePanel />
 
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
