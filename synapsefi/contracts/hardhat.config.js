@@ -25,7 +25,7 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      polygonZkevmTestnet: process.env.POLYGON_ZKEVM_API_KEY || ""
+      polygonZkevmTestnet: process.env.POLYGON_ZKEVM_API_KEY || "",
     },
     customChains: [
       {
@@ -35,7 +35,6 @@ module.exports = {
           apiURL: "https://api-cardona-zkevm.polygonscan.com/api",
           browserURL: "https://cardona-zkevm.polygonscan.com"
         }
-      }
     ]
   },
   gasReporter: {

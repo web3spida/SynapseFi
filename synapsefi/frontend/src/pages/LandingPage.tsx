@@ -144,7 +144,7 @@ export const LandingPage: FC = () => {
             <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">P</span>
             </div>
-            <span className="text-gray-400">Built for the Polygon Buildathon</span>
+            <span className="text-gray-400">Built with Love on Polygon Chain </span>
           </div>
           <p className="text-gray-500 text-sm">
             SynapseFi - AI-Powered Credit Intelligence on Polygon zkEVM

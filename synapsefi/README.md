@@ -22,14 +22,14 @@ A premium DeFi application that provides AI-powered on-chain credit scoring and 
 ### Smart Contracts
 - **Language**: Solidity ^0.8.20
 - **Framework**: Hardhat
-- **Network**: Polygon zkEVM Testnet
+- **Network**: Polygon zkEVM Cardona Testnet
 - **Libraries**: OpenZeppelin Contracts
 
 ## 📋 Prerequisites
 
 - Node.js (v16 or higher)
 - MetaMask or compatible wallet
-- Polygon zkEVM Testnet configuration
+- Polygon zkEVM Cardona Testnet configuration
 
 ## 🚀 Quick Start
 
@@ -115,10 +115,10 @@ npm run dev
 
 ## 🌐 Network Configuration
 
-**Polygon zkEVM Testnet (Cardona)**
+**Polygon zkEVM Cardona Testnet**
 - Chain ID: 2442
 - RPC URL: https://rpc.cardona.zkevm-rpc.com
-- Explorer: https://explorer-ui.cardona.zkevm-rpc.com
+- Explorer: https://cardona-zkevm.polygonscan.com
 
 ## 🤝 Contributing
 

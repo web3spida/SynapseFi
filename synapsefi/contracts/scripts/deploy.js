@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("🚀 Deploying SynapseFi contracts to Polygon zkEVM Testnet...");
+  console.log("🚀 Deploying SynapseFi contracts to Polygon zkEVM Cardona Testnet...");
   
   const [deployer] = await ethers.getSigners();
   console.log("📍 Deploying contracts with account:", deployer.address);
@@ -54,13 +54,12 @@ async function main() {
   
   // Verify contracts if API key is available
   if (process.env.POLYGON_ZKEVM_API_KEY) {
-    console.log("\n🔍 Waiting for block confirmations before verification...");
-    await synapseToken.deploymentTransaction().wait(5);
-    await creditPassport.deploymentTransaction().wait(5);
-    
-    console.log("\n✅ Contracts ready for verification!");
-    console.log("Run: npx hardhat verify --network polygonZkevmTestnet", synapseTokenAddress, initialSupply.toString());
-    console.log("Run: npx hardhat verify --network polygonZkevmTestnet", creditPassportAddress);
+    console.log("\n🔍 Waiting for block confirmations before verification...")
+    await synapseToken.deploymentTransaction().wait(5)
+    await creditPassport.deploymentTransaction().wait(5)
+    console.log("\n✅ Contracts ready for verification!")
+    console.log("Run: npx hardhat verify --network polygonZkevmTestnet", synapseTokenAddress, initialSupply.toString())
+    console.log("Run: npx hardhat verify --network polygonZkevmTestnet", creditPassportAddress)
   }
 }
 
