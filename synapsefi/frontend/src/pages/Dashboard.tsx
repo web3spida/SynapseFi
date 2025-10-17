@@ -45,7 +45,7 @@ export const Dashboard: React.FC = () => {
     try {
       const newScore = Math.floor(Math.random() * 300) + 550; // Random score between 550-850
       
-      await updateContract({
+      await updateScore({
         address: CONTRACT_ADDRESSES.CREDIT_PASSPORT as `0x${string}`,
         abi: CREDIT_PASSPORT_ABI,
         functionName: 'updateScore',
