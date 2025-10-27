@@ -53,6 +53,17 @@ export const Docs: FC = () => {
             </section>
 
             <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20 mb-8">
+              <h2 className="text-2xl font-semibold text-white mb-3">Polymarket Integration</h2>
+              <p className="text-gray-300">The Dashboard includes a Polymarket tab for market discovery and viewing recent trades.</p>
+              <ul className="text-gray-300 list-disc pl-6 mt-2 space-y-1">
+                <li>Gamma Markets API: <code className="text-purple-300">{`VITE_POLYMARKET_GAMMA_API`}</code> (default: gamma-api.polymarket.com)</li>
+                <li>Data API (trades): <code className="text-purple-300">{`VITE_POLYMARKET_DATA_API`}</code> (default: data-api.polymarket.com)</li>
+                <li>CLOB API: <code className="text-purple-300">{`VITE_POLYMARKET_CLOB_API`}</code> (not used for placing orders in this UI)</li>
+              </ul>
+              <p className="text-gray-400 mt-3 text-sm">Trading via API requires CLOB authentication and on-chain approvals; this app currently provides read-only market data with links to Polymarket for execution.</p>
+            </section>
+
+            <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20 mb-8">
               <h2 className="text-2xl font-semibold text-white mb-3">Frontend Integration</h2>
               <p className="text-gray-300">The Dashboard uses wagmi hooks to read and write to CreditPassport:</p>
               <pre className="mt-3 p-4 bg-black/50 rounded-lg text-xs text-gray-300 overflow-x-auto"><code>{`import { useReadContract, useWriteContract } from 'wagmi'

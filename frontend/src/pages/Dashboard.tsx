@@ -9,13 +9,14 @@ import { CONTRACT_ADDRESSES, ZERO_ADDRESS, formatAddress } from '../utils/consta
 import { RefreshCw, Settings, User, BarChart3, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { BridgePanel } from '../components/BridgePanel';
+import { PolymarketPanel } from '../components/PolymarketPanel';
 
 export const Dashboard: FC = () => {
   const { address, isConnected } = useAccount();
   const [score, setScore] = useState<number>(650);
   const [lastUpdated, setLastUpdated] = useState<number>(Math.floor(Date.now() / 1000));
   const [collapsed, setCollapsed] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'passport' | 'governance'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'passport' | 'governance' | 'polymarket'>('dashboard');
 
   const isContractConfigured = useMemo(() => (
     CONTRACT_ADDRESSES.CREDIT_PASSPORT !== ZERO_ADDRESS
@@ -73,6 +74,7 @@ export const Dashboard: FC = () => {
   const sidebarItems = [
     { key: 'dashboard' as const, icon: BarChart3, label: 'Dashboard', disabled: false },
     { key: 'passport' as const, icon: User, label: 'My Passport', disabled: false },
+    { key: 'polymarket' as const, icon: BarChart3, label: 'Polymarket', disabled: false },
     { key: 'governance' as const, icon: Settings, label: 'Governance', disabled: true },
   ];
 
@@ -297,6 +299,20 @@ export const Dashboard: FC = () => {
                 lastUpdated={lastUpdated}
                 isLoading={isReading}
               />
+            </motion.div>
+          )}
+          {activeTab === 'polymarket' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="mb-8">
+                <h1 className="text-4xl font-bold text-white mb-2">Polymarket</h1>
+                <p className="text-gray-400">Discover markets and view recent trades</p>
+              </div>
+              <PolymarketPanel />
             </motion.div>
           )}
         </main>
