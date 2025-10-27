@@ -10,6 +10,8 @@ import { LandingPage } from './pages/LandingPage'
 import { Dashboard } from './pages/Dashboard'
 import { polygonAmoy } from './utils/chains'
 import { Docs } from './pages/Docs'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { NotFound } from './pages/NotFound'
 
 const projectId = import.meta.env.VITE_WC_PROJECT_ID as string | undefined
 
@@ -44,13 +46,16 @@ function App() {
           modalSize="compact"
         >
           <Router>
-            <div className="min-h-screen bg-black text-white">
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/docs" element={<Docs />} />
-              </Routes>
-            </div>
+            <ErrorBoundary>
+              <div className="min-h-screen bg-black text-white">
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/docs" element={<Docs />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </ErrorBoundary>
           </Router>
         </RainbowKitProvider>
       </QueryClientProvider>

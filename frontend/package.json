@@ -13,6 +13,7 @@
   "dependencies": {
     "@maticnetwork/maticjs": "^3.9.6",
     "@maticnetwork/maticjs-ethers": "^1.1.0",
+    "@polymarket/clob-client": "^4.22.8",
     "@rainbow-me/rainbowkit": "^2.0.0",
     "@safe-global/safe-apps-provider": "^0.18.6",
     "@safe-global/safe-apps-sdk": "^9.1.0",

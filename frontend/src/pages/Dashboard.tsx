@@ -10,6 +10,7 @@ import { RefreshCw, Settings, User, BarChart3, ChevronsLeft, ChevronsRight } fro
 import toast, { Toaster } from 'react-hot-toast';
 import { BridgePanel } from '../components/BridgePanel';
 import { PolymarketPanel } from '../components/PolymarketPanel';
+import { ClobAuthPanel } from '../components/ClobAuthPanel';
 
 export const Dashboard: FC = () => {
   const { address, isConnected } = useAccount();
@@ -310,8 +311,9 @@ export const Dashboard: FC = () => {
             >
               <div className="mb-8">
                 <h1 className="text-4xl font-bold text-white mb-2">Polymarket</h1>
-                <p className="text-gray-400">Discover markets and view recent trades</p>
+                <p className="text-gray-400">Authenticate and discover markets</p>
               </div>
+              <ClobAuthPanel />
               <PolymarketPanel />
             </motion.div>
           )}
