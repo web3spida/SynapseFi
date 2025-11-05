@@ -8,7 +8,7 @@ import './styles/animations.css'
 
 import { LandingPage } from './pages/LandingPage'
 import { Dashboard } from './pages/Dashboard'
-import { polygonAmoy } from './utils/chains'
+import { polygonAmoy, polygon } from './utils/chains'
 import { Docs } from './pages/Docs'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { NotFound } from './pages/NotFound'
@@ -18,7 +18,7 @@ const projectId = import.meta.env.VITE_WC_PROJECT_ID as string | undefined
 const config = getDefaultConfig({
   appName: 'SynapseFi',
   projectId: projectId || '00000000000000000000000000000000',
-  chains: [polygonAmoy],
+  chains: [polygonAmoy, polygon],
   ssr: false,
 })
 

@@ -24,6 +24,20 @@ export const CONTRACT_ADDRESSES = {
   SYNAPSE_TOKEN: envAddress('VITE_SYNAPSE_TOKEN_ADDRESS'),
 } as const
 
+// Polygon mainnet chain id
+export const POLYGON_CHAIN_ID = 137
+export const isPolygonMainnet = (chainId?: number) => chainId === POLYGON_CHAIN_ID
+
+// Polymarket core contracts on Polygon mainnet
+export const POLYMARKET_ADDRESSES = {
+  // USDC.e on Polygon (Polymarket settlement token)
+  USDC: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+  // Polymarket CTF Exchange (spender/operator)
+  EXCHANGE: '0x4bfb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E',
+  // Gnosis Conditional Tokens (ERC1155) on Polygon
+  CONDITIONAL_TOKENS: '0x4D97DCd97eC945f40cF65F87097ACe5EA0476045',
+} as const
+
 export const clampScore = (score: number): number => {
   const s = Number.isFinite(score) ? score : 0
   return Math.max(0, Math.min(850, Math.round(s)))

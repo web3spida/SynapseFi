@@ -51,7 +51,7 @@ export const ClobAuthPanel: FC = () => {
       </div>
 
       <div className="text-xs text-gray-400 mb-3">
-        Uses a signed EIP-712 message to derive API credentials. Trades settle on Polygon (chainId 137).
+        Uses a signed EIP-712 message to derive API credentials. This will briefly switch your wallet to Polygon Mainnet (chainId 137) to sign, then switch back.
       </div>
 
       {error && (

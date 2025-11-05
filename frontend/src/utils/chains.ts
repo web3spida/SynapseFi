@@ -13,3 +13,17 @@ export const polygonAmoy: Chain = {
   },
   testnet: true,
 }
+
+export const polygon: Chain = {
+  id: 137,
+  name: 'Polygon',
+  nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['https://polygon-rpc.com', 'https://rpc.ankr.com/polygon'] },
+    public: { http: ['https://polygon-rpc.com', 'https://rpc.ankr.com/polygon'] },
+  },
+  blockExplorers: {
+    default: { name: 'Polygonscan', url: 'https://polygonscan.com' },
+  },
+  testnet: false,
+}

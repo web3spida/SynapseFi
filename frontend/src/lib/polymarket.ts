@@ -90,6 +90,23 @@ export const fetchTrades = (params?: { market?: string; token_id?: string; limit
   })
 }
 
+// CLOB helpers: fetch market parameters and order book snapshot
+export type PMBookLevel = { price: number; size: number }
+export type PMBook = {
+  bids: PMBookLevel[]
+  asks: PMBookLevel[]
+  tick_size: number
+  neg_risk: boolean
+}
+
+export const fetchClobMarkets = (ids: string[]) => {
+  return apiGet<any>(POLYMARKET_ENDPOINTS.CLOB, '/get-markets', { ids: ids.join(',') })
+}
+
+export const fetchBook = (token_id: string) => {
+  return apiGet<PMBook>(POLYMARKET_ENDPOINTS.CLOB, '/get-book', { token_id })
+}
+
 export const polymarketUrlForMarket = (slug?: string, id?: string) => {
   if (slug) return `https://polymarket.com/market/${slug}`
   if (id) return `https://polymarket.com/market/${id}`
