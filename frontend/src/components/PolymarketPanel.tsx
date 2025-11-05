@@ -8,6 +8,7 @@ import { ClobAuthPanel } from './ClobAuthPanel'
 import { PolymarketApprovals } from './PolymarketApprovals'
 import { OrderbookWidget } from './OrderbookWidget'
 import { PolymarketOrderForm } from './PolymarketOrderForm'
+import { NegativeRiskExplorer } from './NegativeRiskExplorer'
 import { reconnectClobWithSavedCreds } from '@/lib/clob'
 
 export const PolymarketPanel: FC = () => {
@@ -217,6 +218,9 @@ export const PolymarketPanel: FC = () => {
                 Derive API key, select a market, and choose an outcome to place orders.
               </div>
             )}
+          </div>
+          <div>
+            <NegativeRiskExplorer market={selected || undefined} client={clob?.client || undefined} />
           </div>
         </div>
       </div>
