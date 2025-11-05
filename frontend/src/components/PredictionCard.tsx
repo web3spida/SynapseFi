@@ -50,6 +50,15 @@ export const PredictionCard: FC<Props> = ({ marketId, tokenId }) => {
     }
   }
 
+  const handleShareX = () => {
+    try {
+      const text = encodeURIComponent('Exploring this Polymarket setup on SynapseFi ✦')
+      const shareUrl = encodeURIComponent(url)
+      const intent = `https://twitter.com/intent/tweet?text=${text}&url=${shareUrl}`
+      window.open(intent, '_blank')
+    } catch {}
+  }
+
   return (
     <div ref={cardRef} className="p-4 rounded-xl border border-gray-700 bg-gray-900/50 space-y-3">
       <div className="text-white font-medium">Shareable Prediction Card</div>
@@ -78,6 +87,9 @@ export const PredictionCard: FC<Props> = ({ marketId, tokenId }) => {
         </button>
         <button onClick={handleSnapshot} className="inline-flex items-center gap-2 bg-purple-600/80 text-white px-3 py-2 rounded-xl font-medium border border-purple-500/50 hover:bg-purple-500 transition disabled:opacity-50" disabled={capturing}>
           {capturing ? 'Capturing…' : 'Download Image'}
+        </button>
+        <button onClick={handleShareX} className="inline-flex items-center gap-2 bg-blue-600/80 text-white px-3 py-2 rounded-xl font-medium border border-blue-500/50 hover:bg-blue-500 transition">
+          Share to X
         </button>
       </div>
       <p className="text-xs text-gray-500">This link pre-fills the order form for the selected market/outcome.</p>

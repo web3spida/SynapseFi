@@ -6,7 +6,7 @@ import { POLYMARKET_ADDRESSES, formatNumber } from '@/utils/constants'
 import { ERC1155_MIN_ABI } from '@/utils/erc1155'
 import { fetchBook, type PMMarket } from '@/lib/polymarket'
 import { computeRealizedPnl } from '@/lib/pnl'
-import { getLocalFills } from '@/lib/fills'
+import { getLocalFills, fetchUserFills } from '@/lib/fills'
 
 const getCostKey = (addr: string, tokenId: string) => `pm:cost:${addr}:${tokenId}`
 
@@ -33,6 +33,15 @@ export const PortfolioView: FC<{ market?: PMMarket | null }> = ({ market }) => {
     })),
   })
 
+  const fillsQ = useQueries({
+    queries: outcomes.map((o) => ({
+      queryKey: ['pm', 'portfolio', 'fills', address, o.tokenId],
+      queryFn: () => (address && o.tokenId ? fetchUserFills(address, o.tokenId) : Promise.resolve([])),
+      enabled: !!address && !!o.tokenId,
+      refetchInterval: 10_000,
+    })),
+  })
+
   const rows = useMemo(() => {
     return outcomes.map((o, i) => {
       const bal = balances[i]?.data as unknown as bigint | undefined
@@ -43,14 +52,15 @@ export const PortfolioView: FC<{ market?: PMMarket | null }> = ({ market }) => {
       const qty = typeof bal === 'bigint' ? Number(bal) : 0
       const costKey = address && o.tokenId ? getCostKey(address, o.tokenId) : ''
       const stored = costKey ? Number(localStorage.getItem(costKey) || '0') : 0
-      const fills = getLocalFills(address, o.tokenId || '')
+      const remoteFills = (fillsQ[i]?.data as any[]) || []
+      const fills = (remoteFills.length ? remoteFills : getLocalFills(address, o.tokenId || ''))
       const { realized, avgCost } = computeRealizedPnl(fills)
       const costBasis = (fills.length ? avgCost : stored) || 0
       const pnlUnrealized = (mid - costBasis) * qty
       const breakeven = costBasis
       return { o, qty, bestBid, bestAsk, mid, pnlUnrealized, realized, breakeven, costKey }
     })
-  }, [outcomes, balances.map(b => b?.data).join('|'), booksQ.map(q => q.data).join('|'), address])
+  }, [outcomes, balances.map(b => b?.data).join('|'), booksQ.map(q => q.data).join('|'), fillsQ.map(q => q.data).join('|'), address])
 
   const setCost = (key: string, val: number) => {
     if (!key) return

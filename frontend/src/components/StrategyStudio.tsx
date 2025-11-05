@@ -6,7 +6,7 @@ import type { ClobClient } from '@polymarket/clob-client'
 import { fetchMarkets, fetchBook, fetchClobMarkets, type PMMarket } from '@/lib/polymarket'
 import { useAccount, useReadContract } from 'wagmi'
 import { ERC1155_MIN_ABI } from '@/utils/erc1155'
-import { POLYMARKET_ADDRESSES } from '@/utils/constants'
+import { POLYMARKET_ADDRESSES, formatNumber } from '@/utils/constants'
 
 type MarketSnapshot = {
   market: PMMarket
@@ -131,6 +131,26 @@ export const StrategyStudio: FC<{ client?: ClobClient | null }> = ({ client }) =
         </div>
       </div>
       <div className="text-xs text-gray-400">Risk-aware sizing active: uses your ERC1155 balances to reduce buys when overweight and cap sells to holdings.</div>
+      {/* Exposure Overlay */}
+      <div className="mt-2 p-3 rounded-lg border border-gray-800 bg-gray-900/50">
+        <div className="text-gray-300 text-xs mb-2">Exposure Overlay</div>
+        {selectedOutcomes.length === 0 ? (
+          <div className="text-gray-500 text-xs">Select markets to view outcome holdings.</div>
+        ) : (
+          <div className="space-y-1 text-xs text-gray-300">
+            {selectedOutcomes.map((o, i) => {
+              const v = balances[i]?.data as unknown as bigint | undefined
+              const qty = typeof v === 'bigint' ? Number(v) : 0
+              return (
+                <div key={o.tokenId || i} className="flex items-center justify-between">
+                  <span className="text-gray-400">{o.name || 'Outcome'} ({o.tokenId})</span>
+                  <span className="text-white font-medium">{formatNumber(qty)}</span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
       <div className="grid md:grid-cols-2 gap-3">
         {snapshots.map(s => (

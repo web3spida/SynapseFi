@@ -108,6 +108,44 @@ npm run dev
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 
+## 📦 Phase 2 Updates
+
+- Realized P&L in Portfolio: FIFO calculator (`src/lib/pnl.ts`) with fills sourcing.
+- Live Fills Wiring: Authenticated CLOB fetch (`src/lib/fills.ts`), graceful fallback to local.
+- Strategy Studio Enhancements: Risk‑aware basket sizing using ERC1155 balances and an exposure overlay.
+- Shareable Prediction Cards: Client‑side snapshot via `html-to-image` and deep‑link sharing; Open Graph/Twitter meta tags in `frontend/index.html`.
+
+### Polymarket Integration Details
+- Environment variables:
+  - `VITE_POLYMARKET_GAMMA_API` (default: `https://gamma-api.polymarket.com`)
+  - `VITE_POLYMARKET_DATA_API` (default: `https://data-api.polymarket.com`)
+  - `VITE_POLYMARKET_CLOB_API` (default: `https://clob.polymarket.com`)
+- CLOB Auth: Use the Polymarket tab’s “CLOB Authentication” to derive API key/passphrase (EIP‑712 signature on Polygon). Credentials are cached in localStorage.
+- Fills: `fetchUserFills(address, tokenId?)` attempts authenticated endpoints on `VITE_POLYMARKET_CLOB_API` and falls back to local fills cache when unavailable.
+
+### Added Files/Changes
+- `frontend/src/lib/pnl.ts`: FIFO realized P&L and mark‑to‑market utils.
+- `frontend/src/lib/fills.ts`: Local fills persistence and authenticated remote fetch.
+- `frontend/src/components/PortfolioView.tsx`: Displays unrealized/realized P&L per outcome and totals.
+- `frontend/src/components/StrategyStudio.tsx`: Risk‑aware sizing and exposure overlay.
+- `frontend/src/components/PredictionCard.tsx`: Snapshot download and “Share to X” deep‑link.
+- `frontend/index.html`: Social meta tags for rich previews.
+
+## 🧭 Roadmap (Next Phases)
+
+### Phase 3
+- Replace fallback with fully verified CLOB fills endpoint usage; add pagination and date ranges.
+- Persist cost basis adjustments and reconcile with fills to handle partials, fees, and shorts.
+- Strategy insights: display exposure vs. target weighting; suggest rebalancing trades.
+- Negative‑risk baskets: improve selection heuristics and size distribution with constraints.
+- Sharing: optional server‑side image rendering for stable social previews; add market slugs in deep‑links.
+
+### Phase 4
+- Backtesting and P&L analytics: per‑market and portfolio‑level charts; session export.
+- Performance: code‑split large vendor bundles and reduce initial payload; memoize heavy hooks.
+- Testing: unit tests for P&L math and fills mapping; integration tests for UI flows.
+- Monitoring: basic telemetry and error reporting in dev with opt‑in.
+
 ### Contracts
 - `npm run compile` - Compile contracts
 - `npm run deploy` - Deploy to Polygon Amoy Testnet
