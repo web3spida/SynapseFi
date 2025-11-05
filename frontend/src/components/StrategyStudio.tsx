@@ -4,6 +4,9 @@ import { useQuery, useQueries } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import type { ClobClient } from '@polymarket/clob-client'
 import { fetchMarkets, fetchBook, fetchClobMarkets, type PMMarket } from '@/lib/polymarket'
+import { useAccount, useReadContract } from 'wagmi'
+import { ERC1155_MIN_ABI } from '@/utils/erc1155'
+import { POLYMARKET_ADDRESSES } from '@/utils/constants'
 
 type MarketSnapshot = {
   market: PMMarket
@@ -16,6 +19,7 @@ type MarketSnapshot = {
 }
 
 export const StrategyStudio: FC<{ client?: ClobClient | null }> = ({ client }) => {
+  const { address } = useAccount()
   const [limit, setLimit] = useState<number>(12)
   const [selectedMarkets, setSelectedMarkets] = useState<Record<string, PMMarket>>({})
 
@@ -41,6 +45,18 @@ export const StrategyStudio: FC<{ client?: ClobClient | null }> = ({ client }) =
       queryFn: () => (o.tokenId ? fetchBook(o.tokenId) : Promise.resolve(null)),
       refetchInterval: 2500,
     }))),
+  })
+
+  // Portfolio exposures (ERC1155 balances) for selected markets
+  const selectedOutcomes = Object.values(selectedMarkets).flatMap(m => m.outcomes || [])
+  const balances = selectedOutcomes.map((o) => {
+    return useReadContract({
+      address: POLYMARKET_ADDRESSES.CONDITIONAL_TOKENS as `0x${string}`,
+      abi: ERC1155_MIN_ABI,
+      functionName: 'balanceOf',
+      args: [address as `0x${string}`, BigInt(o.tokenId || '0')],
+      query: { enabled: !!address && !!o.tokenId },
+    })
   })
 
   const snapshots: MarketSnapshot[] = useMemo(() => {
@@ -82,7 +98,15 @@ export const StrategyStudio: FC<{ client?: ClobClient | null }> = ({ client }) =
       for (const o of (m.outcomes || [])) {
         const book = booksQs[markets.flatMap(x => x.outcomes || []).findIndex(x => x.tokenId === o.tokenId)]?.data as any
         const price = mode === 'buy' ? (book?.asks?.[0]?.price ?? 0) : (book?.bids?.[0]?.price ?? 0)
-        targets.push({ token_id: o.tokenId!, price, size: 5, market_id: m.id, tick_size: tick ?? 0.01, neg_risk: true, side: mode })
+        // Risk-aware sizing based on current ERC1155 holdings
+        const balIdx = selectedOutcomes.findIndex(x => x.tokenId === o.tokenId)
+        const balRaw = balIdx >= 0 ? (balances[balIdx]?.data as unknown as bigint | undefined) : undefined
+        const held = typeof balRaw === 'bigint' ? Number(balRaw) : 0
+        const base = 5
+        const size = mode === 'buy' ? Math.max(0, base - held) : Math.min(base, held)
+        if (price > 0 && size > 0) {
+          targets.push({ token_id: o.tokenId!, price, size, market_id: m.id, tick_size: tick ?? 0.01, neg_risk: true, side: mode })
+        }
       }
     }
     try {
@@ -106,6 +130,7 @@ export const StrategyStudio: FC<{ client?: ClobClient | null }> = ({ client }) =
           </select>
         </div>
       </div>
+      <div className="text-xs text-gray-400">Risk-aware sizing active: uses your ERC1155 balances to reduce buys when overweight and cap sells to holdings.</div>
 
       <div className="grid md:grid-cols-2 gap-3">
         {snapshots.map(s => (
