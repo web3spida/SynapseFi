@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { FC } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'

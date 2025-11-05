@@ -50,7 +50,7 @@ export const StrategyStudio: FC<{ client?: ClobClient | null }> = ({ client }) =
       const negRisk = Boolean(p?.neg_risk)
       const outs = m.outcomes || []
       let sumAsk = 0, sumBid = 0
-      outs.forEach((o, oi) => {
+      outs.forEach((_, oi) => {
         const qIndex = markets.slice(0, mi).reduce((acc, prev) => acc + (prev.outcomes?.length || 0), 0) + oi
         const book = booksQs[qIndex]?.data as any
         const bestBid = book?.bids?.[0]?.price ?? 0

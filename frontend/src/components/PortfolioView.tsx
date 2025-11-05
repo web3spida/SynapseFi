@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { FC } from 'react'
 import { useAccount, useReadContract } from 'wagmi'
 import { useQueries } from '@tanstack/react-query'
