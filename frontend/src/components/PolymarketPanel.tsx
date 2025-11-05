@@ -1,14 +1,24 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FC } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Search, ExternalLink, RefreshCw } from 'lucide-react'
 import { fetchMarkets, fetchTags, fetchTrades, polymarketUrlForMarket, type PMMarket, type PMTrade } from '@/lib/polymarket'
+import { ClobAuthPanel } from './ClobAuthPanel'
+import { PolymarketApprovals } from './PolymarketApprovals'
+import { OrderbookWidget } from './OrderbookWidget'
+import { PolymarketOrderForm } from './PolymarketOrderForm'
+import { reconnectClobWithSavedCreds } from '@/lib/clob'
 
 export const PolymarketPanel: FC = () => {
   const [query, setQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState<number | 'all'>('all')
   const [selected, setSelected] = useState<PMMarket | null>(null)
+  const [clob, setClob] = useState<Awaited<ReturnType<typeof reconnectClobWithSavedCreds>>>(null)
+
+  useEffect(() => {
+    (async () => setClob(await reconnectClobWithSavedCreds()))()
+  }, [])
 
   const tagsQuery = useQuery({
     queryKey: ['pm', 'tags'],
@@ -45,6 +55,9 @@ export const PolymarketPanel: FC = () => {
     setSelected(m)
   }
 
+  // Choose first outcome token for demo orderbook/order form
+  const tokenId = selected?.outcomes?.[0]?.tokenId || ''
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -57,7 +70,12 @@ export const PolymarketPanel: FC = () => {
         <a href="https://docs.polymarket.com/" target="_blank" rel="noreferrer" className="text-xs text-purple-300 hover:underline">Learn more</a>
       </div>
 
+      {/* Auth + Approvals + Search */}
       <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <div className="md:col-span-1 space-y-4">
+          <ClobAuthPanel />
+          <PolymarketApprovals />
+        </div>
         <div className="md:col-span-2 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -183,6 +201,20 @@ export const PolymarketPanel: FC = () => {
                     <div>{t.size ?? '-'}</div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+          {/* Orderbook + Order Form */}
+          <div className="p-4 rounded-xl border border-gray-700 bg-gray-900/50">
+            <div className="text-white font-medium mb-2">Orderbook</div>
+            <OrderbookWidget tokenId={tokenId} />
+          </div>
+          <div>
+            {clob?.client && selected?.id && tokenId ? (
+              <PolymarketOrderForm client={clob.client} marketId={selected.id} tokenId={tokenId} />
+            ) : (
+              <div className="p-4 rounded-xl border border-gray-700 bg-gray-900/50 text-sm text-gray-500">
+                Derive API key, select a market, and choose an outcome to place orders.
               </div>
             )}
           </div>
