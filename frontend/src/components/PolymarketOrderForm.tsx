@@ -9,12 +9,15 @@ type Props = {
   client: ClobClient
   marketId: string
   tokenId: string
+  initialSide?: 'buy' | 'sell'
+  initialPrice?: number
+  initialSize?: number
 }
 
-export const PolymarketOrderForm: FC<Props> = ({ client, marketId, tokenId }) => {
-  const [side, setSide] = useState<'buy' | 'sell'>('buy')
-  const [price, setPrice] = useState<number>(0.5)
-  const [size, setSize] = useState<number>(10)
+export const PolymarketOrderForm: FC<Props> = ({ client, marketId, tokenId, initialSide, initialPrice, initialSize }) => {
+  const [side, setSide] = useState<'buy' | 'sell'>(initialSide ?? 'buy')
+  const [price, setPrice] = useState<number>(initialPrice ?? 0.5)
+  const [size, setSize] = useState<number>(initialSize ?? 10)
   const [submitting, setSubmitting] = useState(false)
 
   const marketQuery = useQuery({
