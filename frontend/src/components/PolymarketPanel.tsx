@@ -11,6 +11,7 @@ import { PolymarketOrderForm } from './PolymarketOrderForm'
 import { NegativeRiskExplorer } from './NegativeRiskExplorer'
 import { PortfolioView } from './PortfolioView'
 import { PredictionCard } from './PredictionCard'
+import { StrategyStudio } from './StrategyStudio'
 import { reconnectClobWithSavedCreds } from '@/lib/clob'
 
 export const PolymarketPanel: FC = () => {
@@ -266,6 +267,9 @@ export const PolymarketPanel: FC = () => {
           </div>
           <div>
             <NegativeRiskExplorer market={selected || undefined} client={clob?.client || undefined} />
+          </div>
+          <div>
+            <StrategyStudio client={clob?.client || null} />
           </div>
           <div>
             <PredictionCard marketId={selected?.id} tokenId={tokenId} />
