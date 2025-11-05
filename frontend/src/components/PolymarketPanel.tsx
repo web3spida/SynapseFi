@@ -7,6 +7,7 @@ import { fetchMarkets, fetchTags, fetchTrades, polymarketUrlForMarket, type PMMa
 import { ClobAuthPanel } from './ClobAuthPanel'
 import { PolymarketApprovals } from './PolymarketApprovals'
 import { OrderbookWidget } from './OrderbookWidget'
+import { StreamingOrderbook } from './StreamingOrderbook'
 import { PolymarketOrderForm } from './PolymarketOrderForm'
 import { NegativeRiskExplorer } from './NegativeRiskExplorer'
 import { reconnectClobWithSavedCreds } from '@/lib/clob'
@@ -207,8 +208,8 @@ export const PolymarketPanel: FC = () => {
           </div>
           {/* Orderbook + Order Form */}
           <div className="p-4 rounded-xl border border-gray-700 bg-gray-900/50">
-            <div className="text-white font-medium mb-2">Orderbook</div>
-            <OrderbookWidget tokenId={tokenId} />
+            <div className="text-white font-medium mb-2">Orderbook (Live)</div>
+            <StreamingOrderbook tokenId={tokenId} />
           </div>
           <div>
             {clob?.client && selected?.id && tokenId ? (
