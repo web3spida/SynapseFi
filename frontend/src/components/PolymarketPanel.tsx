@@ -6,16 +6,18 @@ import { Search, ExternalLink, RefreshCw } from 'lucide-react'
 import { fetchMarkets, fetchTags, fetchTrades, polymarketUrlForMarket, type PMMarket, type PMTrade } from '@/lib/polymarket'
 import { ClobAuthPanel } from './ClobAuthPanel'
 import { PolymarketApprovals } from './PolymarketApprovals'
-import { OrderbookWidget } from './OrderbookWidget'
 import { StreamingOrderbook } from './StreamingOrderbook'
 import { PolymarketOrderForm } from './PolymarketOrderForm'
 import { NegativeRiskExplorer } from './NegativeRiskExplorer'
+import { PortfolioView } from './PortfolioView'
+import { PredictionCard } from './PredictionCard'
 import { reconnectClobWithSavedCreds } from '@/lib/clob'
 
 export const PolymarketPanel: FC = () => {
   const [query, setQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState<number | 'all'>('all')
   const [selected, setSelected] = useState<PMMarket | null>(null)
+  const [selectedTokenId, setSelectedTokenId] = useState<string>('')
   const [clob, setClob] = useState<Awaited<ReturnType<typeof reconnectClobWithSavedCreds>>>(null)
 
   useEffect(() => {
@@ -55,10 +57,42 @@ export const PolymarketPanel: FC = () => {
 
   const handleSelect = (m: PMMarket) => {
     setSelected(m)
+    setSelectedTokenId(m?.outcomes?.[0]?.tokenId || '')
   }
 
   // Choose first outcome token for demo orderbook/order form
-  const tokenId = selected?.outcomes?.[0]?.tokenId || ''
+  const tokenId = selectedTokenId || selected?.outcomes?.[0]?.tokenId || ''
+
+  // Deep-link parsing: marketId, slug, tokenId, side, price, size
+  useEffect(() => {
+    const u = new URL(window.location.href)
+    const qMarketId = u.searchParams.get('marketId') || undefined
+    const qSlug = u.searchParams.get('slug') || undefined
+    const qTokenId = u.searchParams.get('tokenId') || undefined
+    const qSide = (u.searchParams.get('side') as 'buy' | 'sell' | null) || null
+    const qPrice = u.searchParams.get('price')
+    const qSize = u.searchParams.get('size')
+
+    if ((qMarketId || qSlug) && markets.length > 0 && !selected) {
+      const found = markets.find(m => (qMarketId && m.id === qMarketId) || (qSlug && m.slug === qSlug))
+      if (found) {
+        setSelected(found)
+        if (qTokenId) setSelectedTokenId(qTokenId)
+      }
+    }
+    if (qTokenId && selected) setSelectedTokenId(qTokenId)
+    // Store prefill states for order form in state scoped to panel
+    if (qSide || qPrice || qSize) {
+      setPrefill({
+        side: (qSide ?? undefined) as any,
+        price: qPrice ? Number(qPrice) : undefined,
+        size: qSize ? Number(qSize) : undefined,
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markets, selected])
+
+  const [prefill, setPrefill] = useState<{ side?: 'buy' | 'sell'; price?: number; size?: number }>({})
 
   return (
     <motion.div
@@ -213,7 +247,14 @@ export const PolymarketPanel: FC = () => {
           </div>
           <div>
             {clob?.client && selected?.id && tokenId ? (
-              <PolymarketOrderForm client={clob.client} marketId={selected.id} tokenId={tokenId} />
+              <PolymarketOrderForm
+                client={clob.client}
+                marketId={selected.id}
+                tokenId={tokenId}
+                initialSide={prefill.side}
+                initialPrice={prefill.price}
+                initialSize={prefill.size}
+              />
             ) : (
               <div className="p-4 rounded-xl border border-gray-700 bg-gray-900/50 text-sm text-gray-500">
                 Derive API key, select a market, and choose an outcome to place orders.
@@ -221,7 +262,13 @@ export const PolymarketPanel: FC = () => {
             )}
           </div>
           <div>
+            <PortfolioView market={selected || undefined} />
+          </div>
+          <div>
             <NegativeRiskExplorer market={selected || undefined} client={clob?.client || undefined} />
+          </div>
+          <div>
+            <PredictionCard marketId={selected?.id} tokenId={tokenId} />
           </div>
         </div>
       </div>
