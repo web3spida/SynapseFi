@@ -58,9 +58,9 @@ export const Docs: FC = () => {
               <ul className="text-gray-300 list-disc pl-6 mt-2 space-y-1">
                 <li>Gamma Markets API: <code className="text-purple-300">{`VITE_POLYMARKET_GAMMA_API`}</code> (default: gamma-api.polymarket.com)</li>
                 <li>Data API (trades): <code className="text-purple-300">{`VITE_POLYMARKET_DATA_API`}</code> (default: data-api.polymarket.com)</li>
-                <li>CLOB API: <code className="text-purple-300">{`VITE_POLYMARKET_CLOB_API`}</code> (not used for placing orders in this UI)</li>
+                <li>CLOB API: <code className="text-purple-300">{`VITE_POLYMARKET_CLOB_API`}</code> (used for order params, book, and placing orders)</li>
               </ul>
-              <p className="text-gray-400 mt-3 text-sm">Trading via API requires CLOB authentication and on-chain approvals; this app currently provides read-only market data with links to Polymarket for execution.</p>
+              <p className="text-gray-400 mt-3 text-sm">Trading via API requires CLOB authentication and on-chain approvals. This app derives a CLOB API key from your browser wallet, checks USDC/Conditional Tokens approvals on Polygon, and enables placing limit orders from the Polymarket panel.</p>
             </section>
 
             <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20 mb-8">

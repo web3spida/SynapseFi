@@ -46,7 +46,8 @@ export const PolymarketOrderForm: FC<Props> = ({ client, marketId, tokenId, init
 
       const orderReq: any = {
         token_id: tokenId,
-        side,
+        // CLOB expects upper-case side; normalize just in case
+        side: (side || 'buy').toUpperCase(),
         price: p,
         size,
         market_id: marketId,
