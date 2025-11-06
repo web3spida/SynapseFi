@@ -64,6 +64,26 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true
+    host: true,
+    proxy: {
+      '/api/gamma': {
+        target: 'https://gamma-api.polymarket.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path: string) => path.replace(/^\/api\/gamma/, '')
+      },
+      '/api/data': {
+        target: 'https://data-api.polymarket.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path: string) => path.replace(/^\/api\/data/, '')
+      },
+      '/api/clob': {
+        target: 'https://clob.polymarket.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path: string) => path.replace(/^\/api\/clob/, '')
+      }
+    }
   }
 })

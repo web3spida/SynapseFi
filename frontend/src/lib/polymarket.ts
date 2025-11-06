@@ -6,9 +6,10 @@
  */
 
 export const POLYMARKET_ENDPOINTS = {
-  GAMMA: (import.meta.env.VITE_POLYMARKET_GAMMA_API as string) || 'https://gamma-api.polymarket.com',
-  DATA: (import.meta.env.VITE_POLYMARKET_DATA_API as string) || 'https://data-api.polymarket.com',
-  CLOB: (import.meta.env.VITE_POLYMARKET_CLOB_API as string) || 'https://clob.polymarket.com',
+  // Prefer same-origin proxy paths by default; fall back to absolute if env provides one
+  GAMMA: (import.meta.env.VITE_POLYMARKET_GAMMA_API as string) || '/api/gamma',
+  DATA: (import.meta.env.VITE_POLYMARKET_DATA_API as string) || '/api/data',
+  CLOB: (import.meta.env.VITE_POLYMARKET_CLOB_API as string) || '/api/clob',
 } as const
 
 export type PMMarket = {
