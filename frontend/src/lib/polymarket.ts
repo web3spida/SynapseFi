@@ -39,8 +39,23 @@ export type PMTrade = {
   match_time?: string
 }
 
+function resolveBase(base: string) {
+  try {
+    // If base is absolute (http/https), this will succeed
+    // eslint-disable-next-line no-new
+    new URL(base)
+    // Ensure trailing slash so relative paths append correctly
+    return base.endsWith('/') ? base : `${base}/`
+  } catch {
+    // Treat as relative to current origin
+    const abs = new URL(base, window.location.origin).toString()
+    return abs.endsWith('/') ? abs : `${abs}/`
+  }
+}
+
 async function apiGet<T>(base: string, path: string, params?: Record<string, any>, signal?: AbortSignal): Promise<T> {
-  const url = new URL(path, base)
+  const pathNormalized = path.startsWith('/') ? path.slice(1) : path
+  const url = new URL(pathNormalized, resolveBase(base))
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v))

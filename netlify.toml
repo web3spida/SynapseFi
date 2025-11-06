@@ -11,8 +11,33 @@
   to = "/index.html"
   status = 200
 
+# Proxy Polymarket APIs to avoid browser CORS on production
+[[redirects]]
+  from = "/api/gamma/*"
+  to = "https://gamma-api.polymarket.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/data/*"
+  to = "https://data-api.polymarket.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/clob/*"
+  to = "https://clob.polymarket.com/:splat"
+  status = 200
+  force = true
+
 [context.production.environment]
   VITE_ENVIRONMENT = "production"
+  VITE_POLYMARKET_GAMMA_API = "/api/gamma"
+  VITE_POLYMARKET_DATA_API = "/api/data"
+  VITE_POLYMARKET_CLOB_API = "/api/clob"
 
 [context.deploy-preview.environment]
   VITE_ENVIRONMENT = "development"
+  VITE_POLYMARKET_GAMMA_API = "/api/gamma"
+  VITE_POLYMARKET_DATA_API = "/api/data"
+  VITE_POLYMARKET_CLOB_API = "/api/clob"
