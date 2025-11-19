@@ -17,9 +17,6 @@ export const Docs: FC = () => {
               <h2 className="text-2xl font-semibold text-white mb-3">Contracts</h2>
               <ul className="text-gray-300 space-y-2">
                 <li>
-                  <span className="font-medium text-purple-300">CreditPassport</span> address: <code className="text-purple-300">{CONTRACT_ADDRESSES.CREDIT_PASSPORT}</code>
-                </li>
-                <li>
                   <span className="font-medium text-purple-300">SynapseToken</span> address: <code className="text-purple-300">{CONTRACT_ADDRESSES.SYNAPSE_TOKEN}</code>
                 </li>
               </ul>
@@ -32,7 +29,6 @@ export const Docs: FC = () => {
               <ul className="text-gray-300 list-disc pl-6 mt-2 space-y-1">
                 <li><code className="text-purple-300">VITE_CHAIN_ID</code> (e.g., 80002)</li>
                 <li><code className="text-purple-300">VITE_RPC_URL</code> (Polygon Amoy RPC)</li>
-                <li><code className="text-purple-300">VITE_CREDIT_PASSPORT_ADDRESS</code></li>
                 <li><code className="text-purple-300">VITE_SYNAPSE_TOKEN_ADDRESS</code></li>
                 <li><code className="text-purple-300">VITE_WC_PROJECT_ID</code> (WalletConnect)</li>
                 <li><code className="text-purple-300">VITE_ENVIRONMENT</code> (development/production)</li>
@@ -40,17 +36,7 @@ export const Docs: FC = () => {
               <p className="text-gray-400 mt-3 text-sm">On Netlify, add these under Site settings → Build & deploy → Environment.</p>
             </section>
 
-            <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20 mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-3">CreditPassport API</h2>
-              <ul className="text-gray-300 list-disc pl-6 mt-2 space-y-1">
-                <li><code className="text-purple-300">getScore(address)</code> → returns <code>score</code> and <code>lastUpdated</code></li>
-                <li><code className="text-purple-300">hasScore(address)</code> → boolean</li>
-                <li><code className="text-purple-300">getUserScore(address)</code> → <code>{`{ user, score, lastUpdated }`}</code></li>
-                <li><code className="text-purple-300">updateScore(address, score)</code> → onlyOwner</li>
-                <li><code className="text-purple-300">batchUpdateScores(address[], scores[])</code> → onlyOwner</li>
-              </ul>
-              <p className="text-gray-400 mt-3 text-sm">Only the contract owner can update scores. Users can read their score and history.</p>
-            </section>
+            
 
             <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20 mb-8">
               <h2 className="text-2xl font-semibold text-white mb-3">Polymarket Integration</h2>
@@ -65,28 +51,8 @@ export const Docs: FC = () => {
 
             <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20 mb-8">
               <h2 className="text-2xl font-semibold text-white mb-3">Frontend Integration</h2>
-              <p className="text-gray-300">The Dashboard uses wagmi hooks to read and write to CreditPassport:</p>
-              <pre className="mt-3 p-4 bg-black/50 rounded-lg text-xs text-gray-300 overflow-x-auto"><code>{`import { useReadContract, useWriteContract } from 'wagmi'
-import { CREDIT_PASSPORT_ABI } from '@/utils/abis'
-import { CONTRACT_ADDRESSES } from '@/utils/constants'
-
-const { data } = useReadContract({
-  address: CONTRACT_ADDRESSES.CREDIT_PASSPORT as \
-    \`0x\${string}\`,
-  abi: CREDIT_PASSPORT_ABI,
-  functionName: 'getScore',
-  args: [address],
-})
-
-const { writeContract } = useWriteContract()
-writeContract({
-  address: CONTRACT_ADDRESSES.CREDIT_PASSPORT as \
-    \`0x\${string}\`,
-  abi: CREDIT_PASSPORT_ABI,
-  functionName: 'updateScore', // owner only
-  args: [address, 650],
-})`}</code></pre>
-              <p className="text-gray-400 mt-3 text-sm">Make sure your wallet is funded with test POL and connected to Amoy.</p>
+              <p className="text-gray-300">The Dashboard includes a Polymarket tab for market discovery, approvals, live orderbooks, and placing orders via CLOB API authentication.</p>
+              <p className="text-gray-400 mt-3 text-sm">Make sure your wallet is funded and connected to Polygon.</p>
             </section>
 
             <section className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20">

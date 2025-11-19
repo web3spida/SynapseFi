@@ -13,14 +13,13 @@ export const addressEquals = (a?: string, b?: string): boolean => {
 }
 
 const envAddress = (
-  key: 'VITE_CREDIT_PASSPORT_ADDRESS' | 'VITE_SYNAPSE_TOKEN_ADDRESS'
+  key: 'VITE_SYNAPSE_TOKEN_ADDRESS'
 ): string => {
   const value = import.meta.env[key] as string | undefined
   return value && isHexAddress(value) ? value : ZERO_ADDRESS
 }
 
 export const CONTRACT_ADDRESSES = {
-  CREDIT_PASSPORT: envAddress('VITE_CREDIT_PASSPORT_ADDRESS'),
   SYNAPSE_TOKEN: envAddress('VITE_SYNAPSE_TOKEN_ADDRESS'),
 } as const
 
@@ -38,33 +37,6 @@ export const POLYMARKET_ADDRESSES = {
   CONDITIONAL_TOKENS: '0x4D97DCd97eC945f40cF65F87097ACe5EA0476045',
 } as const
 
-export const clampScore = (score: number): number => {
-  const s = Number.isFinite(score) ? score : 0
-  return Math.max(0, Math.min(850, Math.round(s)))
-}
-
-export const getScoreTier = (score: number): {
-  tier: string
-  color: string
-  risk: 'Low' | 'Medium' | 'High'
-} => {
-  const s = clampScore(score)
-  if (s >= 800) {
-    return { tier: 'Excellent', color: '#10B981', risk: 'Low' }
-  } else if (s >= 700) {
-    return { tier: 'Good', color: '#3B82F6', risk: 'Low' }
-  } else if (s >= 600) {
-    return { tier: 'Fair', color: '#F59E0B', risk: 'Medium' }
-  } else if (s >= 500) {
-    return { tier: 'Poor', color: '#EF4444', risk: 'High' }
-  } else {
-    return { tier: 'Very Poor', color: '#DC2626', risk: 'High' }
-  }
-}
-
-export const scoreToProgress = (score: number): number => {
-  return Math.round((clampScore(score) / 850) * 100)
-}
 
 export const formatAddress = (address: string, leading = 6, trailing = 4): string => {
   if (!isHexAddress(address)) return ''
