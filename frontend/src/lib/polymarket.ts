@@ -5,11 +5,15 @@
  * - CLOB API: https://clob.polymarket.com (order params + book)
  */
 
+const isDev = !!import.meta.env.DEV
 export const POLYMARKET_ENDPOINTS = {
-  // Prefer same-origin proxy paths by default; fall back to absolute if env provides one
-  GAMMA: (import.meta.env.VITE_POLYMARKET_GAMMA_API as string) || '/api/gamma',
-  DATA: (import.meta.env.VITE_POLYMARKET_DATA_API as string) || '/api/data',
-  CLOB: (import.meta.env.VITE_POLYMARKET_CLOB_API as string) || '/api/clob',
+  // In dev, use Vite proxy paths unless env overrides; in prod, default to absolute endpoints
+  GAMMA: (import.meta.env.VITE_POLYMARKET_GAMMA_API as string)
+    || (isDev ? '/api/gamma' : 'https://gamma-api.polymarket.com'),
+  DATA: (import.meta.env.VITE_POLYMARKET_DATA_API as string)
+    || (isDev ? '/api/data' : 'https://data-api.polymarket.com'),
+  CLOB: (import.meta.env.VITE_POLYMARKET_CLOB_API as string)
+    || (isDev ? '/api/clob' : 'https://clob.polymarket.com'),
 } as const
 
 export type PMMarket = {
