@@ -2,9 +2,12 @@ import React from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useStore } from '../../store/useStore';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
 
 export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobileMenu }) => {
-  const { isConnected, isConnecting, connectWallet, disconnectWallet, wallets } = useStore();
+  const { wallets } = useStore();
+  const { address, isConnected } = useAccount();
   const primaryWallet = wallets.find(w => w.isPrimary);
 
   return (
@@ -37,27 +40,15 @@ export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobil
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-bg-primary"></span>
           </button>
 
-          {isConnected ? (
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden sm:block">
-                <div className="text-sm font-medium text-white">
-                  {primaryWallet?.address}
-                </div>
-                <div className="text-xs text-text-tertiary">Connected</div>
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <div className="text-sm font-medium text-white">
+                {address || primaryWallet?.address || 'Not connected'}
               </div>
-              <Button variant="secondary" onClick={disconnectWallet} className="!py-2 !px-4">
-                Disconnect
-              </Button>
+              <div className="text-xs text-text-tertiary">{isConnected ? 'Connected' : 'Disconnected'}</div>
             </div>
-          ) : (
-            <Button 
-              onClick={connectWallet} 
-              loading={isConnecting}
-              className="!py-2"
-            >
-              Connect Wallet
-            </Button>
-          )}
+            <ConnectButton chainStatus="none" showBalance={false} />
+          </div>
         </div>
       </div>
     </header>

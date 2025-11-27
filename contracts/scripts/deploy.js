@@ -1,4 +1,6 @@
 const { ethers } = require("hardhat");
+const fs = require("fs");
+const path = require("path");
 
 async function main() {
   console.log("Deploying SynapseFi contracts to Polygon Amoy Testnet (PoS)...");
@@ -35,6 +37,23 @@ async function main() {
 
   console.log("\nDeployment Info:");
   console.log(JSON.stringify(deploymentInfo, null, 2));
+
+  // Persist deployment for frontend consumption
+  try {
+    const deploymentsDir = path.join(__dirname, "..", "deployments");
+    if (!fs.existsSync(deploymentsDir)) fs.mkdirSync(deploymentsDir);
+    const jsonPath = path.join(deploymentsDir, "latest.json");
+    fs.writeFileSync(jsonPath, JSON.stringify(deploymentInfo, null, 2));
+
+    const frontendEnvPath = path.join(__dirname, "..", "..", "frontend", ".env.local");
+    const envContent = `VITE_CREDIT_PASSPORT_ADDRESS=${creditPassportAddress}\nVITE_SYNAPS_TOKEN_ADDRESS=${synapseTokenAddress}\n`;
+    fs.writeFileSync(frontendEnvPath, envContent);
+    console.log("\nWrote:");
+    console.log("-", jsonPath);
+    console.log("-", frontendEnvPath);
+  } catch (e) {
+    console.log("\nWarning: failed to persist deployment info:", e?.message || e);
+  }
 
   // Verification instructions
   if (process.env.POLYGONSCAN_API_KEY) {

@@ -1,12 +1,16 @@
 import { create } from 'zustand';
 import { CreditScoreData, UserWallet, Transaction } from '../types';
 import { MOCK_SCORE_DATA, MOCK_WALLETS, MOCK_TRANSACTIONS } from '../constants';
+import { getContract } from '../lib/ethers';
+import CreditPassportAbi from '../contracts/abis/CreditPassport.json';
+import { CREDIT_PASSPORT_ADDRESS } from '../constants/contracts';
 
 interface AppState {
   isConnected: boolean;
   isConnecting: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
+  connectedAddress?: string;
   
   creditScore: CreditScoreData;
   wallets: UserWallet[];
@@ -31,9 +35,21 @@ export const useStore = create<AppState>((set, get) => ({
   isConnecting: false,
   connectWallet: async () => {
     set({ isConnecting: true });
-    // Simulate connection delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    set({ isConnected: true, isConnecting: false });
+    try {
+      if (!('ethereum' in window)) throw new Error('No wallet found');
+      const accounts: string[] = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+      const address = accounts?.[0];
+      set({ isConnected: true, isConnecting: false, connectedAddress: address });
+      try {
+        if (CREDIT_PASSPORT_ADDRESS) {
+          const contract = await getContract(CREDIT_PASSPORT_ADDRESS, CreditPassportAbi);
+          const has = await contract.hasPassport(address);
+          set({ hasPassport: Boolean(has) });
+        }
+      } catch {}
+    } finally {
+      set({ isConnecting: false });
+    }
   },
   disconnectWallet: () => set({ isConnected: false }),
 
@@ -50,12 +66,35 @@ export const useStore = create<AppState>((set, get) => ({
   isMinting: false,
   mintPassport: async () => {
     set({ isMinting: true });
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    set({ hasPassport: true, isMinting: false });
+    try {
+      if (!CREDIT_PASSPORT_ADDRESS) throw new Error('Passport contract address not configured');
+      const contract = await getContract(CREDIT_PASSPORT_ADDRESS, CreditPassportAbi);
+      const addr = get().connectedAddress;
+      if (!addr) throw new Error('Wallet not connected');
+
+      const defaultUri = `https://synapsefi.app/passport/${addr}`;
+      const tx = await contract.mintPassport(defaultUri);
+      await tx.wait();
+      set({ hasPassport: true });
+    } finally {
+      set({ isMinting: false });
+    }
   },
   updatePassportMetadata: async () => {
-    // Simulate metadata refresh from chain
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      if (!CREDIT_PASSPORT_ADDRESS) return;
+      const contract = await getContract(CREDIT_PASSPORT_ADDRESS, CreditPassportAbi);
+      const addr = get().connectedAddress;
+      if (!addr) return;
+      const tokenId = await contract.passportOf(addr);
+      if (Number(tokenId) > 0) {
+        await contract.tokenURI(tokenId);
+        const [score] = await contract.getScore(addr);
+        set((state) => ({
+          creditScore: { ...state.creditScore, current: Number(score) || state.creditScore.current }
+        }));
+      }
+    } catch {}
   },
 
   bridgeLoading: false,

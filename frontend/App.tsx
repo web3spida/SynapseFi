@@ -7,11 +7,13 @@ import { Wallets } from './pages/Wallets';
 import { Bridge } from './pages/Bridge';
 import { Passport } from './pages/Passport';
 import { Docs } from './pages/Docs';
+import { WalletSync } from './components/system/WalletSync';
 
 function App() {
   return (
     <HashRouter>
       <Layout>
+        <WalletSync />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/wallets" element={<Wallets />} />
