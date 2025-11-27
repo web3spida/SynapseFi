@@ -1,18 +1,11 @@
 import { createConfig, http } from 'wagmi';
 import { polygonAmoy } from 'wagmi/chains';
-import { connectorsForWallets } from '@rainbow-me/rainbowkit';
-import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
+import { injected } from 'wagmi/connectors';
 
 export const wagmiConfig = createConfig({
   chains: [polygonAmoy],
   transports: {
     [polygonAmoy.id]: http(),
   },
-  connectors: connectorsForWallets([
-    {
-      groupName: 'Recommended',
-      wallets: [injectedWallet],
-    },
-  ]),
+  connectors: [injected()],
 });
-
