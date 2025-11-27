@@ -32,7 +32,7 @@ export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobil
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
             <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
-            <span className="text-xs font-medium text-purple-300">Polygon Amoy</span>
+            <span className="text-xs font-medium text-purple-300">Wallet</span>
           </div>
 
           <button className="p-2 rounded-full hover:bg-white/5 text-text-secondary relative">
@@ -43,9 +43,9 @@ export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobil
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <div className="text-sm font-medium text-white">
-                {address || primaryWallet?.address || 'Not connected'}
+                {isConnected ? address : ''}
               </div>
-              <div className="text-xs text-text-tertiary">{isConnected ? 'Connected' : 'Disconnected'}</div>
+              <div className="text-xs text-text-tertiary">{isConnected ? 'Connected' : ''}</div>
             </div>
             <ConnectButton chainStatus="none" showBalance={false} />
           </div>

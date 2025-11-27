@@ -57,9 +57,9 @@ export const useStore = create<AppState>((set, get) => ({
   wallets: MOCK_WALLETS,
   transactions: MOCK_TRANSACTIONS,
   balances: {
-    'USDC': '1420.50',
-    'MATIC': '542.10',
-    'WETH': '0.45',
+    'USDC': '0.00',
+    'MATIC': '0.00',
+    'WETH': '0.00',
   },
 
   hasPassport: false,
