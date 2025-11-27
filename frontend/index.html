@@ -1,28 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SynapseFi - AI-Powered Credit Intelligence</title>
-    <meta name="description" content="AI-powered credit and risk intelligence network on Polygon zkEVM" />
-    <!-- Open Graph -->
-    <meta property="og:title" content="SynapseFi – Predictions & Portfolio" />
-    <meta property="og:description" content="Share pre-filled prediction links and view live P&L and balances." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="/" />
-    <meta property="og:image" content="/vite.svg" />
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="SynapseFi – Predictions & Portfolio" />
-    <meta name="twitter:description" content="Share pre-filled prediction links and view live P&L and balances." />
-    <meta name="twitter:image" content="/vite.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  </head>
+    <title>SynapseFi | Decentralized Credit Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              bg: {
+                primary: '#0A0A0F',
+                secondary: '#15151E',
+                tertiary: '#1E1E2E',
+              },
+              purple: {
+                400: '#A78BFA',
+                500: '#8B5CF6',
+                600: '#7C3AED',
+              },
+              success: '#10B981',
+              warning: '#F59E0B',
+              error: '#EF4444',
+              info: '#3B82F6',
+              text: {
+                primary: '#F9FAFB',
+                secondary: '#D1D5DB',
+                tertiary: '#9CA3AF',
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+          },
+        },
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: #0A0A0F;
+        color: #F9FAFB;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0A0A0F; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1E1E2E; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #8B5CF6; 
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.24",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "zustand": "https://aistudiocdn.com/zustand@^5.0.8",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <script type="module" src="/index.tsx"></script>
+</body>
 </html>

@@ -1,89 +1,23 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
-import type { Plugin as EsbuildPlugin } from 'esbuild'
-import fs from 'fs'
+import path from 'path';
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// Esbuild plugin to strip unsupported JSON import attributes from a specific dependency
-const jsonImportFixPlugin: EsbuildPlugin = {
-  name: 'json-import-with-fix',
-  setup(build) {
-    build.onLoad({ filter: /node_modules\/@base-org\/account\/dist\/core\/constants\.js$/ }, async (args) => {
-      const contents = await fs.promises.readFile(args.path, 'utf8')
-      const fixed = contents.replace(/ with\s*\{\s*type:\s*['"]json['"]\s*\}/g, '')
-      return { contents: fixed, loader: 'js' }
-    })
-  }
-}
-
-// Vite transform plugin to ensure build stage also strips unsupported import attributes
-const fixImportAttrRollup = {
-  name: 'fix-import-attributes-rollup',
-  enforce: 'pre' as const,
-  transform(code: string, id: string) {
-    if (id.includes('node_modules/@base-org/account/dist/core/constants.js')) {
-      return {
-        code: code.replace(/ with\s*\{\s*type:\s*['"]json['"]\s*\}/g, ''),
-        map: null,
-      }
-    }
-    return null
-  },
-}
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [fixImportAttrRollup, react()],
-  define: {
-    // Polyfill process.env for libraries that expect Node globals (e.g., matic.js)
-    'process.env': {},
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      plugins: [jsonImportFixPlugin],
-    },
-    exclude: ['@base-org/account'],
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor': ['react', 'react-dom'],
-          'ui': ['framer-motion', 'lucide-react'],
-          'web3': ['wagmi', 'viem', '@rainbow-me/rainbowkit']
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, '.', '');
+    return {
+      server: {
+        port: 3000,
+        host: '0.0.0.0',
+      },
+      plugins: [react()],
+      define: {
+        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+      },
+      resolve: {
+        alias: {
+          '@': path.resolve(__dirname, '.'),
         }
       }
-    }
-  },
-  server: {
-    port: 3000,
-    host: true,
-    proxy: {
-      '/api/gamma': {
-        target: 'https://gamma-api.polymarket.com',
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path: string) => path.replace(/^\/api\/gamma/, '')
-      },
-      '/api/data': {
-        target: 'https://data-api.polymarket.com',
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path: string) => path.replace(/^\/api\/data/, '')
-      },
-      '/api/clob': {
-        target: 'https://clob.polymarket.com',
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path: string) => path.replace(/^\/api\/clob/, '')
-      }
-    }
-  }
-})
+    };
+});
