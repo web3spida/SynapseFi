@@ -4,7 +4,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { ArrowDown, ArrowRight, Settings2, History, ChevronDown, Fuel, Info, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TOKENS } from '../constants';
+import { TOKENS, TOKEN_ADDRESSES } from '../constants';
 
 export const Bridge: React.FC = () => {
   const { executeBridge, bridgeLoading, transactions, balances } = useStore();
@@ -13,6 +13,7 @@ export const Bridge: React.FC = () => {
   const [toChain, setToChain] = useState('Polygon zkEVM');
   const [selectedToken, setSelectedToken] = useState(TOKENS[0]);
   const [showTokenSelect, setShowTokenSelect] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   
   // Gas Estimation State
   const [gasFee, setGasFee] = useState<{ eth: string; usd: string } | null>(null);
@@ -22,28 +23,46 @@ export const Bridge: React.FC = () => {
   const currentBalance = parseFloat(balances[selectedToken.symbol] || '0');
   const hasInsufficientBalance = parseFloat(amount || '0') > currentBalance;
 
-  // Simulate Gas Estimation when amount or token changes
+  // Price-aware gas estimate via server-side LI.FI quote
   useEffect(() => {
-    if (!amount) {
-      setGasFee(null);
-      return;
+    let alive = true;
+    async function estimate() {
+      if (!amount) {
+        setGasFee(null);
+        return;
+      }
+      setIsEstimating(true);
+      try {
+        const params = new URLSearchParams({
+          fromChain: '137',
+          toChain: '1101',
+          fromToken: selectedToken.symbol === 'MATIC' ? '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' : selectedToken.symbol === 'USDC' ? '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' : '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+          toToken: selectedToken.symbol === 'MATIC' ? '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' : selectedToken.symbol === 'USDC' ? '0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035' : '0x4f9A0e7fD2bF6067dB6994cf12e4495DF938e6e9',
+          fromAmount: (Number(amount) * (selectedToken.symbol === 'USDC' ? 1e6 : 1e18)).toString(),
+        });
+        const res = await fetch(`/.netlify/functions/lifi-quote?${params.toString()}`);
+        const json = await res.json();
+        const steps = json?.steps || json?.route?.steps || [];
+        let usd = 0;
+        let native = 0;
+        for (const s of steps) {
+          const gc = s?.estimate?.gasCosts || [];
+          for (const c of gc) {
+            const amountUSD = Number(c?.amountUSD || c?.priceUSD || 0);
+            const amount = Number(c?.amount || 0);
+            if (!isNaN(amountUSD)) usd += amountUSD;
+            if (!isNaN(amount)) native += amount;
+          }
+        }
+        if (alive) setGasFee({ eth: native ? native.toFixed(6) : '--', usd: usd ? usd.toFixed(2) : '--' });
+      } catch {
+        if (alive) setGasFee(null);
+      } finally {
+        if (alive) setIsEstimating(false);
+      }
     }
-    
-    setIsEstimating(true);
-    const timer = setTimeout(() => {
-      // Mock calculation based on token type
-      const baseFee = 0.002;
-      const randomFluctuation = Math.random() * 0.001;
-      const estimated = (baseFee + randomFluctuation).toFixed(4);
-      
-      setGasFee({
-        eth: estimated,
-        usd: (parseFloat(estimated) * 0.85).toFixed(4) // Mock MATIC price of ~0.85
-      });
-      setIsEstimating(false);
-    }, 800);
-
-    return () => clearTimeout(timer);
+    estimate();
+    return () => { alive = false; };
   }, [amount, selectedToken]);
 
   const handleSwap = () => {
@@ -53,8 +72,18 @@ export const Bridge: React.FC = () => {
 
   const handleBridge = async () => {
     if (!amount || hasInsufficientBalance) return;
-    await executeBridge(amount, selectedToken.symbol);
-    setAmount('');
+    setErrorMsg('');
+    const supported = TOKEN_ADDRESSES['Polygon PoS'][selectedToken.symbol] && TOKEN_ADDRESSES['Polygon zkEVM'][selectedToken.symbol];
+    if (!supported) {
+      setErrorMsg('Selected token is not supported for bridging yet');
+      return;
+    }
+    try {
+      await executeBridge(amount, selectedToken.symbol);
+      setAmount('');
+    } catch (e: any) {
+      setErrorMsg(e?.message || 'Failed to execute bridge');
+    }
   };
 
   const handleMax = () => {
@@ -175,9 +204,9 @@ export const Bridge: React.FC = () => {
                 <div className="flex items-center justify-between">
                      <div className="flex items-center gap-2 px-2">
                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-[10px] text-purple-300">
-                             {selectedToken.symbol[0]}
-                         </div>
-                         <span className="font-medium text-text-secondary">{selectedToken.symbol}</span>
+                            {(selectedToken.symbol === 'MATIC' && toChain === 'Polygon zkEVM') ? 'E' : selectedToken.symbol[0]}
+                          </div>
+                          <span className="font-medium text-text-secondary">{(selectedToken.symbol === 'MATIC' && toChain === 'Polygon zkEVM') ? 'ETH' : selectedToken.symbol}</span>
                      </div>
                      <div className="text-right text-2xl font-bold text-text-tertiary/80">
                         {amount || '0.00'}
@@ -224,6 +253,15 @@ export const Bridge: React.FC = () => {
             className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center font-medium"
           >
             Insufficient {selectedToken.symbol} balance
+          </motion.div>
+        )}
+        {errorMsg && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="mt-4 p-3 bg-warning/10 border border-warning/20 rounded-lg text-warning text-sm text-center font-medium"
+          >
+            {errorMsg}
           </motion.div>
         )}
 

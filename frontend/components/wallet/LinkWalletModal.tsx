@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Wallet, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useStore } from '../../store/useStore';
+import { useAccount, useSignMessage } from 'wagmi';
+import { verifyMessage } from 'viem';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 interface Props {
   isOpen: boolean;
@@ -15,25 +18,34 @@ export const LinkWalletModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { address: connected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
 
   const handleSignAndLink = async () => {
-    // Basic validation
     if (!address.startsWith('0x') || address.length !== 42) {
-        setError('Invalid Ethereum address format');
-        return;
+      setError('Invalid Ethereum address format');
+      return;
+    }
+    if (!connected || connected.toLowerCase() !== address.toLowerCase()) {
+      setError('Please connect the wallet you want to link');
+      return;
     }
     setError('');
     setStep(2);
     setIsLoading(true);
 
     try {
-        await linkWallet(address);
-        setIsLoading(false);
-        setStep(3);
+      const message = `Link address ${address} to SynapseFi at ${new Date().toISOString()}`;
+      const signature = await signMessageAsync({ message });
+      const valid = await verifyMessage({ address, message, signature });
+      if (!valid) throw new Error('Signature verification failed');
+      await linkWallet(address);
+      setIsLoading(false);
+      setStep(3);
     } catch (e) {
-        setIsLoading(false);
-        setError('Failed to verify ownership. Please try again.');
-        setStep(1);
+      setIsLoading(false);
+      setError('Failed to verify ownership. Please try again.');
+      setStep(1);
     }
   };
 
@@ -80,6 +92,10 @@ export const LinkWalletModal: React.FC<Props> = ({ isOpen, onClose }) => {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-4"
                 >
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-text-tertiary">Connect the wallet to link</div>
+                      <ConnectButton chainStatus="none" showBalance={false} />
+                    </div>
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-300">Wallet Address</label>
                         <div className="relative">
