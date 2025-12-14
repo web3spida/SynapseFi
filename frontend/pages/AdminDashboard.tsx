@@ -95,6 +95,7 @@ export const AdminDashboard: React.FC = () => {
                 <th className="p-4 font-semibold">Asset Name</th>
                 <th className="p-4 font-semibold">Type</th>
                 <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Documents</th>
                 <th className="p-4 font-semibold">APY / Price</th>
                 <th className="p-4 font-semibold">TVL</th>
                 <th className="p-4 font-semibold text-right">Actions</th>
@@ -103,7 +104,7 @@ export const AdminDashboard: React.FC = () => {
             <tbody className="divide-y divide-white/5">
               {filteredAssets.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-text-tertiary">
+                  <td colSpan={7} className="p-8 text-center text-text-tertiary">
                     No assets found matching criteria.
                   </td>
                 </tr>
@@ -121,6 +122,20 @@ export const AdminDashboard: React.FC = () => {
                       <span className={`px-2 py-1 rounded text-xs font-medium border ${getStatusColor(asset.status)}`}>
                         {asset.status}
                       </span>
+                    </td>
+                    <td className="p-4 text-xs text-text-secondary align-top">
+                      {asset.documents && asset.documents.length > 0 ? (
+                        <div className="flex flex-col gap-1 max-w-xs">
+                          {asset.documents.map((doc, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <FileText size={14} className="text-text-tertiary shrink-0" />
+                              <span className="truncate">{doc}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-text-tertiary italic">No documents</span>
+                      )}
                     </td>
                     <td className="p-4">
                       {editingPriceId === asset.id ? (

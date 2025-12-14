@@ -20,6 +20,7 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
     maturity: '',
     description: '',
   });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   if (!isOpen) return null;
 
@@ -33,7 +34,7 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
       risk: formData.risk,
       maturity: formData.maturity,
       description: formData.description,
-      documents: ['valuation_report.pdf', 'legal_opinion.pdf'], // Mock documents
+      documents: selectedFiles.length ? selectedFiles.map((f) => f.name) : undefined,
     });
     onClose();
   };
@@ -133,22 +134,32 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
           </div>
 
           <div>
-             <label className="block text-xs font-medium text-text-secondary mb-2">Supporting Documents</label>
-             <div className="border-2 border-dashed border-white/10 rounded-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-purple-500/30 transition-colors">
-                <Upload size={24} className="text-text-tertiary mb-2" />
-                <p className="text-xs text-text-secondary">Click to upload Valuation Report & Ownership Proof</p>
-                <p className="text-[10px] text-text-tertiary mt-1">(Mock upload for demo)</p>
-             </div>
-             <div className="mt-2 space-y-2">
-                <div className="flex items-center gap-2 text-xs text-green-400">
+            <label className="block text-xs font-medium text-text-secondary mb-2">Supporting Documents</label>
+            <label className="border-2 border-dashed border-white/10 rounded-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-purple-500/30 transition-colors">
+              <Upload size={24} className="text-text-tertiary mb-2" />
+              <p className="text-xs text-text-secondary">Click to upload Valuation Report & Ownership Proof</p>
+              <p className="text-[10px] text-text-tertiary mt-1">PDF or image files, up to 5 files</p>
+              <input
+                type="file"
+                multiple
+                accept=".pdf,image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setSelectedFiles(files.slice(0, 5));
+                }}
+              />
+            </label>
+            {!!selectedFiles.length && (
+              <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
+                {selectedFiles.map((file) => (
+                  <div key={file.name + file.size} className="flex items-center gap-2 text-xs text-green-400">
                     <Check size={12} />
-                    <span>valuation_report.pdf</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-green-400">
-                    <Check size={12} />
-                    <span>legal_opinion.pdf</span>
-                </div>
-             </div>
+                    <span className="truncate">{file.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="pt-4">
