@@ -4,7 +4,9 @@ import { MOCK_SCORE_DATA, MOCK_WALLETS, MOCK_TRANSACTIONS, MOCK_RWA_ASSETS, CHAI
 import { getContract, getSigner } from '../lib/ethers';
 import { ethers } from 'ethers';
 import CreditPassportAbi from '../contracts/abis/CreditPassport.json';
-import { CREDIT_PASSPORT_ADDRESS } from '../constants/contracts';
+import RWARegistryAbi from '../contracts/abis/RWARegistry.json';
+import RWAOracleAbi from '../contracts/abis/RWAOracle.json';
+import { CREDIT_PASSPORT_ADDRESS, RWA_REGISTRY_ADDRESS, RWA_ORACLE_ADDRESS } from '../constants/contracts';
 
 interface AppState {
   isConnected: boolean;
@@ -16,6 +18,8 @@ interface AppState {
   userRole: UserRole;
   setUserRole: (role: UserRole) => void;
   rwaAssets: RWAAsset[];
+  rwaOnchainPrices: Record<string, number>;
+  loadOnchainRwaPrices: () => Promise<void>;
   submitAssetProposal: (asset: Omit<RWAAsset, 'id' | 'status' | 'tvl'>) => void;
   approveAsset: (id: string) => void;
   rejectAsset: (id: string) => void;
@@ -65,6 +69,33 @@ export const useStore = create<AppState>((set, get) => ({
   userRole: 'User',
   setUserRole: (role) => set({ userRole: role }),
   rwaAssets: MOCK_RWA_ASSETS as RWAAsset[], // Cast to RWAAsset[] to match type
+  rwaOnchainPrices: {},
+  loadOnchainRwaPrices: async () => {
+    try {
+      if (!RWA_ORACLE_ADDRESS) return;
+      const state = get();
+      const ids = state.rwaAssets
+        .map((a) => a.id)
+        .filter((id) => Number.isFinite(Number(id)));
+      if (!ids.length) return;
+      const contract = await getContract(RWA_ORACLE_ADDRESS, RWAOracleAbi);
+      const updates: Record<string, number> = {};
+      for (const id of ids) {
+        try {
+          const raw = await contract.getPrice(Number(id));
+          const num = Number(raw);
+          if (Number.isFinite(num) && num > 0) {
+            updates[id] = num / 100;
+          }
+        } catch {}
+      }
+      if (Object.keys(updates).length) {
+        set((state) => ({
+          rwaOnchainPrices: { ...state.rwaOnchainPrices, ...updates }
+        }));
+      }
+    } catch {}
+  },
   submitAssetProposal: (asset) => set((state) => ({
     rwaAssets: [
       ...state.rwaAssets,
@@ -77,15 +108,40 @@ export const useStore = create<AppState>((set, get) => ({
       }
     ]
   })),
-  approveAsset: (id) => set((state) => ({
-    rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Active' } : a)
-  })),
+  approveAsset: (id) => {
+    set((state) => ({
+      rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Active' } : a)
+    }));
+    (async () => {
+      try {
+        if (!RWA_REGISTRY_ADDRESS) return;
+        const numericId = Number(id);
+        if (!Number.isFinite(numericId)) return;
+        const contract = await getContract(RWA_REGISTRY_ADDRESS, RWARegistryAbi);
+        const tx = await contract.approveAsset(numericId);
+        await tx.wait();
+      } catch {}
+    })();
+  },
   rejectAsset: (id) => set((state) => ({
     rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Rejected' } : a)
   })),
-  updateAssetPrice: (id, newApy) => set((state) => ({
-    rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, apy: newApy } : a)
-  })),
+  updateAssetPrice: (id, newApy) => {
+    set((state) => ({
+      rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, apy: newApy } : a)
+    }));
+    (async () => {
+      try {
+        if (!RWA_ORACLE_ADDRESS) return;
+        const numericId = Number(id);
+        if (!Number.isFinite(numericId)) return;
+        const contract = await getContract(RWA_ORACLE_ADDRESS, RWAOracleAbi);
+        const scaled = Math.round(newApy * 100);
+        const tx = await contract.setPrice(numericId, scaled);
+        await tx.wait();
+      } catch {}
+    })();
+  },
 
   creditScore: MOCK_SCORE_DATA,
   wallets: (() => {

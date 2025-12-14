@@ -22,6 +22,18 @@ async function main() {
   const creditPassportAddress = await creditPassport.getAddress();
   console.log("CreditPassport deployed at:", creditPassportAddress);
 
+  const RWARegistry = await ethers.getContractFactory("RWARegistry");
+  const rwaRegistry = await RWARegistry.deploy();
+  await rwaRegistry.waitForDeployment();
+  const rwaRegistryAddress = await rwaRegistry.getAddress();
+  console.log("RWARegistry deployed at:", rwaRegistryAddress);
+
+  const RWAOracle = await ethers.getContractFactory("RWAOracle");
+  const rwaOracle = await RWAOracle.deploy();
+  await rwaOracle.waitForDeployment();
+  const rwaOracleAddress = await rwaOracle.getAddress();
+  console.log("RWAOracle deployed at:", rwaOracleAddress);
+
   // Deployment Summary
   const deploymentInfo = {
     network: "polygonAmoy",
@@ -31,6 +43,12 @@ async function main() {
     },
     creditPassport: {
       address: creditPassportAddress,
+    },
+    rwaRegistry: {
+      address: rwaRegistryAddress,
+    },
+    rwaOracle: {
+      address: rwaOracleAddress,
     },
     timestamp: new Date().toISOString()
   };
@@ -45,11 +63,21 @@ async function main() {
     const jsonPath = path.join(deploymentsDir, "latest.json");
     fs.writeFileSync(jsonPath, JSON.stringify(deploymentInfo, null, 2));
 
-    const frontendEnvPath = path.join(__dirname, "..", "..", "frontend", ".env.local");
-    const envContent = `VITE_CREDIT_PASSPORT_ADDRESS=${creditPassportAddress}\nVITE_SYNAPS_TOKEN_ADDRESS=${synapseTokenAddress}\n`;
-    fs.writeFileSync(frontendEnvPath, envContent);
+    const envContent = [
+      `VITE_CREDIT_PASSPORT_ADDRESS=${creditPassportAddress}`,
+      `VITE_SYNAPS_TOKEN_ADDRESS=${synapseTokenAddress}`,
+      `VITE_RWA_REGISTRY_ADDRESS=${rwaRegistryAddress}`,
+      `VITE_RWA_ORACLE_ADDRESS=${rwaOracleAddress}`
+    ].join("\n");
+
+    const frontendEnvLocalPath = path.join(__dirname, "..", "..", "frontend", ".env.local");
+    fs.writeFileSync(frontendEnvLocalPath, envContent);
+
+    const frontendEnvPath = path.join(__dirname, "..", "..", "frontend", ".env");
+    fs.writeFileSync(frontendEnvPath, envContent + "\n");
     console.log("\nWrote:");
     console.log("-", jsonPath);
+    console.log("-", frontendEnvLocalPath);
     console.log("-", frontendEnvPath);
   } catch (e) {
     console.log("\nWarning: failed to persist deployment info:", e?.message || e);

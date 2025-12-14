@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -7,10 +7,14 @@ import { RWAAsset } from '../types';
 import { AssetProposalModal } from '../components/marketplace/AssetProposalModal';
 
 export const Marketplace: React.FC = () => {
-  const { rwaAssets, userRole, setUserRole, approveAsset, rejectAsset, updateAssetPrice } = useStore();
+  const { rwaAssets, userRole, setUserRole, approveAsset, rejectAsset, updateAssetPrice, rwaOnchainPrices, loadOnchainRwaPrices } = useStore();
   const [filter, setFilter] = useState<string>('All');
   const [search, setSearch] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    loadOnchainRwaPrices();
+  }, [loadOnchainRwaPrices]);
 
   // Filter logic based on role and status
   const filteredAssets = rwaAssets.filter(asset => {
@@ -119,7 +123,9 @@ export const Marketplace: React.FC = () => {
 
       {/* Assets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAssets.map((asset) => (
+        {filteredAssets.map((asset) => {
+          const displayedApy = rwaOnchainPrices[asset.id] ?? asset.apy;
+          return (
           <Card key={asset.id} hover className="flex flex-col h-full group relative overflow-hidden">
             {/* Admin Status Badge */}
             {userRole === 'Admin' && (
@@ -152,16 +158,16 @@ export const Marketplace: React.FC = () => {
                 <div className="bg-bg-primary/50 p-3 rounded-lg border border-white/5">
                   <p className="text-text-tertiary text-xs mb-1">Target APY</p>
                   <p className="text-green-400 font-bold text-lg">
-                      {userRole === 'Admin' && asset.status === 'Active' ? (
-                          <div className="flex items-center gap-2">
-                             {asset.apy}%
-                             <button className="text-text-tertiary hover:text-white" title="Update Price">
-                                 <ArrowUpRight size={12} />
-                             </button>
-                          </div>
-                      ) : (
-                          `${asset.apy}%`
-                      )}
+                    {userRole === 'Admin' && asset.status === 'Active' ? (
+                      <div className="flex items-center gap-2">
+                        {displayedApy}%
+                        <button className="text-text-tertiary hover:text-white" title="Update Price">
+                          <ArrowUpRight size={12} />
+                        </button>
+                      </div>
+                    ) : (
+                      `${displayedApy}%`
+                    )}
                   </p>
                 </div>
                 <div className="bg-bg-primary/50 p-3 rounded-lg border border-white/5">
@@ -243,7 +249,8 @@ export const Marketplace: React.FC = () => {
               )}
             </div>
           </Card>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
