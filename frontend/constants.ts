@@ -58,7 +58,56 @@ export const NAVIGATION_ITEMS = [
   { name: 'Dashboard', path: '/', icon: 'LayoutDashboard' },
   { name: 'Wallets', path: '/wallets', icon: 'Wallet' },
   { name: 'Bridge', path: '/bridge', icon: 'ArrowLeftRight' },
+  { name: 'Marketplace', path: '/marketplace', icon: 'Building2' },
+  { name: 'Admin', path: '/admin', icon: 'Shield' },
   { name: 'Passport', path: '/passport', icon: 'CreditCard' },
+];
+
+export const MOCK_RWA_ASSETS = [
+  {
+    id: '1',
+    name: 'US Treasury Bill Token',
+    type: 'Bond',
+    apy: 5.2,
+    tvl: 15000000,
+    minInvestment: 100,
+    risk: 'Low',
+    maturity: '3 Months',
+    status: 'Active',
+  },
+  {
+    id: '2',
+    name: 'Manhattan Commercial Real Estate',
+    type: 'Real Estate',
+    apy: 8.5,
+    tvl: 4500000,
+    minInvestment: 5000,
+    risk: 'Medium',
+    maturity: '5 Years',
+    status: 'Active',
+  },
+  {
+    id: '3',
+    name: 'Tech Growth Private Credit',
+    type: 'Private Credit',
+    apy: 12.4,
+    tvl: 2100000,
+    minInvestment: 1000,
+    risk: 'High',
+    maturity: '18 Months',
+    status: 'Active',
+  },
+  {
+    id: '4',
+    name: 'Green Energy Infrastructure',
+    type: 'Equity',
+    apy: 9.8,
+    tvl: 8500000,
+    minInvestment: 500,
+    risk: 'Medium',
+    maturity: '10 Years',
+    status: 'Coming Soon',
+  },
 ];
 
 export const TOKENS = [

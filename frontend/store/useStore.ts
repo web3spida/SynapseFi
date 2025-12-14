@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { CreditScoreData, UserWallet, Transaction } from '../types';
-import { MOCK_SCORE_DATA, MOCK_WALLETS, MOCK_TRANSACTIONS, CHAIN_IDS, TOKEN_ADDRESSES, NATIVE_TOKEN_ADDRESS, TOKEN_DECIMALS } from '../constants';
+import { CreditScoreData, UserWallet, Transaction, RWAAsset, UserRole } from '../types';
+import { MOCK_SCORE_DATA, MOCK_WALLETS, MOCK_TRANSACTIONS, MOCK_RWA_ASSETS, CHAIN_IDS, TOKEN_ADDRESSES, NATIVE_TOKEN_ADDRESS, TOKEN_DECIMALS } from '../constants';
 import { getContract, getSigner } from '../lib/ethers';
 import { ethers } from 'ethers';
 import CreditPassportAbi from '../contracts/abis/CreditPassport.json';
@@ -13,6 +13,14 @@ interface AppState {
   disconnectWallet: () => void;
   connectedAddress?: string;
   
+  userRole: UserRole;
+  setUserRole: (role: UserRole) => void;
+  rwaAssets: RWAAsset[];
+  submitAssetProposal: (asset: Omit<RWAAsset, 'id' | 'status' | 'tvl'>) => void;
+  approveAsset: (id: string) => void;
+  rejectAsset: (id: string) => void;
+  updateAssetPrice: (id: string, newApy: number) => void;
+
   creditScore: CreditScoreData;
   wallets: UserWallet[];
   transactions: Transaction[];
@@ -53,6 +61,31 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
   disconnectWallet: () => set({ isConnected: false }),
+
+  userRole: 'User',
+  setUserRole: (role) => set({ userRole: role }),
+  rwaAssets: MOCK_RWA_ASSETS as RWAAsset[], // Cast to RWAAsset[] to match type
+  submitAssetProposal: (asset) => set((state) => ({
+    rwaAssets: [
+      ...state.rwaAssets,
+      {
+        ...asset,
+        id: Math.random().toString(36).substr(2, 9),
+        status: 'Pending Approval',
+        tvl: 0,
+        proposer: state.connectedAddress || '0xUser',
+      }
+    ]
+  })),
+  approveAsset: (id) => set((state) => ({
+    rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Active' } : a)
+  })),
+  rejectAsset: (id) => set((state) => ({
+    rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Rejected' } : a)
+  })),
+  updateAssetPrice: (id, newApy) => set((state) => ({
+    rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, apy: newApy } : a)
+  })),
 
   creditScore: MOCK_SCORE_DATA,
   wallets: (() => {

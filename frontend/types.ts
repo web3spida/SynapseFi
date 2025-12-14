@@ -43,3 +43,20 @@ export interface PassportData {
   tier: 'Gold' | 'Silver' | 'Bronze';
   perks: string[];
 }
+
+export interface RWAAsset {
+  id: string;
+  name: string;
+  type: 'Real Estate' | 'Bond' | 'Private Credit' | 'Equity';
+  apy: number;
+  tvl: number;
+  minInvestment: number;
+  risk: 'Low' | 'Medium' | 'High';
+  maturity: string;
+  status: 'Active' | 'Sold Out' | 'Coming Soon' | 'Draft' | 'Pending Approval' | 'Rejected';
+  proposer?: string; // Address of the user who proposed it
+  documents?: string[]; // List of document names
+  description?: string;
+}
+
+export type UserRole = 'Admin' | 'User';

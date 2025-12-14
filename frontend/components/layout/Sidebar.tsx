@@ -1,16 +1,26 @@
 
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, Wallet, ArrowLeftRight, CreditCard, ExternalLink, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, Wallet, ArrowLeftRight, CreditCard, ExternalLink, HelpCircle, Building2, Shield } from 'lucide-react';
 import { NAVIGATION_ITEMS } from '../../constants';
+import { useStore } from '../../store/useStore';
 
 export const Sidebar: React.FC = () => {
+  const { userRole } = useStore();
+
   const iconMap: Record<string, React.ReactNode> = {
     LayoutDashboard: <LayoutDashboard size={20} />,
     Wallet: <Wallet size={20} />,
     ArrowLeftRight: <ArrowLeftRight size={20} />,
+    Building2: <Building2 size={20} />,
     CreditCard: <CreditCard size={20} />,
+    Shield: <Shield size={20} />,
   };
+
+  const filteredNavItems = NAVIGATION_ITEMS.filter(item => {
+    if (item.path === '/admin') return userRole === 'Admin';
+    return true;
+  });
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-bg-secondary/30 backdrop-blur-md border-r border-white/5 hidden md:flex flex-col z-50">
@@ -38,7 +48,7 @@ export const Sidebar: React.FC = () => {
         </div>
 
         <nav className="space-y-2">
-          {NAVIGATION_ITEMS.map((item) => (
+          {filteredNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}

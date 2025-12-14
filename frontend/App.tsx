@@ -6,6 +6,8 @@ import { Dashboard } from './pages/Dashboard';
 import { Wallets } from './pages/Wallets';
 import { Bridge } from './pages/Bridge';
 import { Passport } from './pages/Passport';
+import { Marketplace } from './pages/Marketplace';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { Docs } from './pages/Docs';
 import { WalletSync } from './components/system/WalletSync';
 
@@ -18,6 +20,8 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/wallets" element={<Wallets />} />
           <Route path="/bridge" element={<Bridge />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/passport" element={<Passport />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="*" element={<Navigate to="/" replace />} />
