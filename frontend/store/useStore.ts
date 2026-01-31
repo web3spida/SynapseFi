@@ -135,7 +135,7 @@ export const useStore = create<AppState>((set, get) => ({
     } catch {}
   },
   submitAssetProposal: (asset) => set((state) => {
-    const next = [
+    const next: RWAAsset[] = [
       ...state.rwaAssets,
       {
         ...asset,
@@ -152,9 +152,14 @@ export const useStore = create<AppState>((set, get) => ({
     const admin = get().connectedAddress || '0xAdmin';
     const timestamp = new Date().toISOString();
     set((state) => {
-      const next = state.rwaAssets.map(a => {
+      const next: RWAAsset[] = state.rwaAssets.map((a) => {
         if (a.id !== id) return a;
-        const auditTrail = [...(a.auditTrail || []), { action: 'Approved', admin, timestamp }];
+        const auditEntry: NonNullable<RWAAsset['auditTrail']>[number] = {
+          action: 'Approved',
+          admin,
+          timestamp
+        };
+        const auditTrail = [...(a.auditTrail || []), auditEntry];
         return { ...a, status: 'Active', auditTrail };
       });
       persistRwaAssets(next);
@@ -175,9 +180,14 @@ export const useStore = create<AppState>((set, get) => ({
     const admin = get().connectedAddress || '0xAdmin';
     const timestamp = new Date().toISOString();
     set((state) => {
-      const next = state.rwaAssets.map(a => {
+      const next: RWAAsset[] = state.rwaAssets.map((a) => {
         if (a.id !== id) return a;
-        const auditTrail = [...(a.auditTrail || []), { action: 'Rejected', admin, timestamp }];
+        const auditEntry: NonNullable<RWAAsset['auditTrail']>[number] = {
+          action: 'Rejected',
+          admin,
+          timestamp
+        };
+        const auditTrail = [...(a.auditTrail || []), auditEntry];
         return { ...a, status: 'Rejected', auditTrail };
       });
       persistRwaAssets(next);

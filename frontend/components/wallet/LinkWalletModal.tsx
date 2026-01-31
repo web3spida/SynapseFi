@@ -36,8 +36,8 @@ export const LinkWalletModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
     try {
       const message = `Link address ${address} to SynapseFi at ${new Date().toISOString()}`;
-      const signature = await signMessageAsync({ message });
-      const valid = await verifyMessage({ address, message, signature });
+      const signature = await signMessageAsync({ message, account: connected as `0x${string}` });
+      const valid = await verifyMessage({ address: address as `0x${string}`, message, signature });
       if (!valid) throw new Error('Signature verification failed');
       await linkWallet(address);
       setIsLoading(false);
