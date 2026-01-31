@@ -3,7 +3,6 @@ import { useStore } from '../store/useStore';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Check, X, Edit, Trash2, Search, Filter, AlertCircle, FileText, ArrowUpRight, DollarSign } from 'lucide-react';
-import { RWAAsset } from '../types';
 
 export const AdminDashboard: React.FC = () => {
   const { rwaAssets, approveAsset, rejectAsset, updateAssetPrice } = useStore();
@@ -127,10 +126,24 @@ export const AdminDashboard: React.FC = () => {
                       {asset.documents && asset.documents.length > 0 ? (
                         <div className="flex flex-col gap-1 max-w-xs">
                           {asset.documents.map((doc, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <FileText size={14} className="text-text-tertiary shrink-0" />
-                              <span className="truncate">{doc}</span>
-                            </div>
+                            doc.url ? (
+                              <a
+                                key={`${doc.name}-${index}`}
+                                href={doc.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                download={doc.name}
+                                className="flex items-center gap-2 hover:text-white transition-colors"
+                              >
+                                <FileText size={14} className="text-text-tertiary shrink-0" />
+                                <span className="truncate">{doc.name}</span>
+                              </a>
+                            ) : (
+                              <div key={`${doc.name}-${index}`} className="flex items-center gap-2 text-text-secondary">
+                                <FileText size={14} className="text-text-tertiary shrink-0" />
+                                <span className="truncate">{doc.name}</span>
+                              </div>
+                            )
                           ))}
                         </div>
                       ) : (

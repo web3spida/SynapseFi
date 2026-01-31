@@ -55,8 +55,9 @@ export interface RWAAsset {
   maturity: string;
   status: 'Active' | 'Sold Out' | 'Coming Soon' | 'Draft' | 'Pending Approval' | 'Rejected';
   proposer?: string; // Address of the user who proposed it
-  documents?: string[]; // List of document names
+  documents?: { name: string; url: string; mime: string; size: number }[];
   description?: string;
+  auditTrail?: { action: 'Approved' | 'Rejected'; admin: string; timestamp: string }[];
 }
 
 export type UserRole = 'Admin' | 'User';

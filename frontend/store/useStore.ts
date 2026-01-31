@@ -43,6 +43,37 @@ interface AppState {
   refreshWalletScore: (address: string) => Promise<void>;
 }
 
+const readRwaAssets = (): RWAAsset[] => {
+  try {
+    const raw = localStorage.getItem('synapsefi_rwa_assets');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed.map((asset) => {
+          const docs = asset?.documents;
+          if (Array.isArray(docs) && docs.length > 0 && typeof docs[0] === 'string') {
+            return {
+              ...asset,
+              documents: docs.map((name: string) => ({
+                name,
+                url: '',
+                mime: '',
+                size: 0
+              }))
+            };
+          }
+          return asset;
+        });
+      }
+    }
+  } catch {}
+  return MOCK_RWA_ASSETS as RWAAsset[];
+};
+
+const persistRwaAssets = (assets: RWAAsset[]) => {
+  try { localStorage.setItem('synapsefi_rwa_assets', JSON.stringify(assets)); } catch {}
+};
+
 export const useStore = create<AppState>((set, get) => ({
   isConnected: false,
   isConnecting: false,
@@ -68,7 +99,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   userRole: 'User',
   setUserRole: (role) => set({ userRole: role }),
-  rwaAssets: MOCK_RWA_ASSETS as RWAAsset[], // Cast to RWAAsset[] to match type
+  rwaAssets: readRwaAssets(),
   rwaOnchainPrices: {},
   loadOnchainRwaPrices: async () => {
     try {
@@ -96,8 +127,8 @@ export const useStore = create<AppState>((set, get) => ({
       }
     } catch {}
   },
-  submitAssetProposal: (asset) => set((state) => ({
-    rwaAssets: [
+  submitAssetProposal: (asset) => set((state) => {
+    const next = [
       ...state.rwaAssets,
       {
         ...asset,
@@ -106,12 +137,22 @@ export const useStore = create<AppState>((set, get) => ({
         tvl: 0,
         proposer: state.connectedAddress || '0xUser',
       }
-    ]
-  })),
+    ];
+    persistRwaAssets(next);
+    return { rwaAssets: next };
+  }),
   approveAsset: (id) => {
-    set((state) => ({
-      rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Active' } : a)
-    }));
+    const admin = get().connectedAddress || '0xAdmin';
+    const timestamp = new Date().toISOString();
+    set((state) => {
+      const next = state.rwaAssets.map(a => {
+        if (a.id !== id) return a;
+        const auditTrail = [...(a.auditTrail || []), { action: 'Approved', admin, timestamp }];
+        return { ...a, status: 'Active', auditTrail };
+      });
+      persistRwaAssets(next);
+      return { rwaAssets: next };
+    });
     (async () => {
       try {
         if (!RWA_REGISTRY_ADDRESS) return;
@@ -123,13 +164,25 @@ export const useStore = create<AppState>((set, get) => ({
       } catch {}
     })();
   },
-  rejectAsset: (id) => set((state) => ({
-    rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, status: 'Rejected' } : a)
-  })),
+  rejectAsset: (id) => {
+    const admin = get().connectedAddress || '0xAdmin';
+    const timestamp = new Date().toISOString();
+    set((state) => {
+      const next = state.rwaAssets.map(a => {
+        if (a.id !== id) return a;
+        const auditTrail = [...(a.auditTrail || []), { action: 'Rejected', admin, timestamp }];
+        return { ...a, status: 'Rejected', auditTrail };
+      });
+      persistRwaAssets(next);
+      return { rwaAssets: next };
+    });
+  },
   updateAssetPrice: (id, newApy) => {
-    set((state) => ({
-      rwaAssets: state.rwaAssets.map(a => a.id === id ? { ...a, apy: newApy } : a)
-    }));
+    set((state) => {
+      const next = state.rwaAssets.map(a => a.id === id ? { ...a, apy: newApy } : a);
+      persistRwaAssets(next);
+      return { rwaAssets: next };
+    });
     (async () => {
       try {
         if (!RWA_ORACLE_ADDRESS) return;

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useStore } from '../../store/useStore';
-import { X, Upload, FileText, Check } from 'lucide-react';
+import { X, Upload, Check } from 'lucide-react';
+import { RWAAsset } from '../../types';
 
 interface AssetProposalModalProps {
   isOpen: boolean;
@@ -20,12 +21,102 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
     maturity: '',
     description: '',
   });
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedDocuments, setSelectedDocuments] = useState<NonNullable<RWAAsset['documents']>>([]);
+  const [fileError, setFileError] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
+
+  const MAX_FILES = 5;
+  const MAX_SIZE_MB = 10;
+  const MAX_FILE_SIZE = MAX_SIZE_MB * 1024 * 1024;
+
+  const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+
+  const uploadDocument = async (file: File) => {
+    const dataUrl = await fileToDataUrl(file);
+    const payload = {
+      name: file.name,
+      mime: file.type || 'application/octet-stream',
+      size: file.size,
+      dataUrl,
+    };
+    try {
+      const res = await fetch('/.netlify/functions/asset-documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        return {
+          name: json.name || file.name,
+          url: json.url || dataUrl,
+          mime: json.mime || payload.mime,
+          size: Number(json.size || file.size),
+        };
+      }
+    } catch {}
+    return {
+      name: payload.name,
+      url: payload.dataUrl,
+      mime: payload.mime,
+      size: payload.size,
+    };
+  };
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files) return;
+    setFileError('');
+    const incoming = Array.from(files);
+    const remainingSlots = Math.max(0, MAX_FILES - selectedDocuments.length);
+    if (remainingSlots === 0) {
+      setFileError(`You can upload up to ${MAX_FILES} files.`);
+      return;
+    }
+    const usable = incoming.slice(0, remainingSlots);
+    if (incoming.length > usable.length) {
+      setFileError(`Only ${MAX_FILES} files allowed. Extra files were ignored.`);
+    }
+    const invalid: string[] = [];
+    const valid = usable.filter((file) => {
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+      const isImage = file.type.startsWith('image/');
+      if (!isPdf && !isImage) {
+        invalid.push(`${file.name}: unsupported type`);
+        return false;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        invalid.push(`${file.name}: exceeds ${MAX_SIZE_MB}MB`);
+        return false;
+      }
+      return true;
+    });
+    if (invalid.length) {
+      setFileError(invalid.slice(0, 3).join(' • '));
+    }
+    if (!valid.length) return;
+    setIsUploading(true);
+    try {
+      const uploaded = await Promise.all(valid.map(uploadDocument));
+      setSelectedDocuments((prev) => [...prev, ...uploaded].slice(0, MAX_FILES));
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isUploading) {
+      setFileError('Upload in progress. Please wait.');
+      return;
+    }
     submitAssetProposal({
       name: formData.name,
       type: formData.type,
@@ -34,7 +125,7 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
       risk: formData.risk,
       maturity: formData.maturity,
       description: formData.description,
-      documents: selectedFiles.length ? selectedFiles.map((f) => f.name) : undefined,
+      documents: selectedDocuments.length ? selectedDocuments : undefined,
     });
     onClose();
   };
@@ -138,24 +229,25 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
             <label className="border-2 border-dashed border-white/10 rounded-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-purple-500/30 transition-colors">
               <Upload size={24} className="text-text-tertiary mb-2" />
               <p className="text-xs text-text-secondary">Click to upload Valuation Report & Ownership Proof</p>
-              <p className="text-[10px] text-text-tertiary mt-1">PDF or image files, up to 5 files</p>
+              <p className="text-[10px] text-text-tertiary mt-1">PDF or image files, up to 5 files, 10MB each</p>
               <input
                 type="file"
                 multiple
                 accept=".pdf,image/*"
                 className="hidden"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  setSelectedFiles(files.slice(0, 5));
-                }}
+                onChange={(e) => handleFiles(e.target.files)}
               />
             </label>
-            {!!selectedFiles.length && (
+            {!!fileError && (
+              <div className="mt-2 text-[11px] text-red-400">{fileError}</div>
+            )}
+            {!!selectedDocuments.length && (
               <div className="mt-2 space-y-2 max-h-32 overflow-y-auto">
-                {selectedFiles.map((file) => (
+                {selectedDocuments.map((file) => (
                   <div key={file.name + file.size} className="flex items-center gap-2 text-xs text-green-400">
                     <Check size={12} />
                     <span className="truncate">{file.name}</span>
+                    <span className="text-[10px] text-text-tertiary">{(file.size / (1024 * 1024)).toFixed(1)}MB</span>
                   </div>
                 ))}
               </div>
@@ -163,7 +255,9 @@ export const AssetProposalModal: React.FC<AssetProposalModalProps> = ({ isOpen, 
           </div>
 
           <div className="pt-4">
-            <Button fullWidth type="submit">Submit Proposal</Button>
+            <Button fullWidth type="submit" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Submit Proposal'}
+            </Button>
           </div>
         </form>
       </Card>
