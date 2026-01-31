@@ -43,8 +43,12 @@ interface AppState {
   refreshWalletScore: (address: string) => Promise<void>;
 }
 
+const canUseStorage = () =>
+  typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+
 const readRwaAssets = (): RWAAsset[] => {
   try {
+    if (!canUseStorage()) return MOCK_RWA_ASSETS as RWAAsset[];
     const raw = localStorage.getItem('synapsefi_rwa_assets');
     if (raw) {
       const parsed = JSON.parse(raw);
@@ -71,7 +75,10 @@ const readRwaAssets = (): RWAAsset[] => {
 };
 
 const persistRwaAssets = (assets: RWAAsset[]) => {
-  try { localStorage.setItem('synapsefi_rwa_assets', JSON.stringify(assets)); } catch {}
+  try {
+    if (!canUseStorage()) return;
+    localStorage.setItem('synapsefi_rwa_assets', JSON.stringify(assets));
+  } catch {}
 };
 
 export const useStore = create<AppState>((set, get) => ({
@@ -198,13 +205,28 @@ export const useStore = create<AppState>((set, get) => ({
 
   creditScore: MOCK_SCORE_DATA,
   wallets: (() => {
-    try { return JSON.parse(localStorage.getItem('synapsefi_wallets') || '[]'); } catch { return MOCK_WALLETS; }
+    try {
+      if (!canUseStorage()) return MOCK_WALLETS;
+      return JSON.parse(localStorage.getItem('synapsefi_wallets') || '[]');
+    } catch {
+      return MOCK_WALLETS;
+    }
   })(),
   transactions: (() => {
-    try { return JSON.parse(localStorage.getItem('synapsefi_transactions') || '[]'); } catch { return MOCK_TRANSACTIONS; }
+    try {
+      if (!canUseStorage()) return MOCK_TRANSACTIONS;
+      return JSON.parse(localStorage.getItem('synapsefi_transactions') || '[]');
+    } catch {
+      return MOCK_TRANSACTIONS;
+    }
   })(),
   balances: (() => {
-    try { return JSON.parse(localStorage.getItem('synapsefi_balances') || '{}'); } catch { return { USDC: '0.00', MATIC: '0.00', WETH: '0.00' }; }
+    try {
+      if (!canUseStorage()) return { USDC: '0.00', MATIC: '0.00', WETH: '0.00' };
+      return JSON.parse(localStorage.getItem('synapsefi_balances') || '{}');
+    } catch {
+      return { USDC: '0.00', MATIC: '0.00', WETH: '0.00' };
+    }
   })(),
 
   hasPassport: false,
