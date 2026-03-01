@@ -1,14 +1,11 @@
 import React from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { useStore } from '../../store/useStore';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
 export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobileMenu }) => {
-  const { wallets } = useStore();
   const { address, isConnected } = useAccount();
-  const primaryWallet = wallets.find(w => w.isPrimary);
 
   return (
     <header className="sticky top-0 z-40 w-full h-20 border-b border-white/5 bg-bg-primary/80 backdrop-blur-md">
@@ -24,7 +21,7 @@ export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobil
           <Search size={18} className="text-text-tertiary mr-3" />
           <input 
             type="text" 
-            placeholder="Search transactions, wallets..." 
+            placeholder="Search assets, pools..." 
             className="bg-transparent border-none outline-none text-sm text-text-primary w-full placeholder-text-tertiary"
           />
         </div>
@@ -32,7 +29,7 @@ export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobil
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
             <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
-            <span className="text-xs font-medium text-purple-300">Wallet</span>
+            <span className="text-xs font-medium text-purple-300">Live Mainnet</span>
           </div>
 
           <button className="p-2 rounded-full hover:bg-white/5 text-text-secondary relative">
@@ -41,12 +38,6 @@ export const Header: React.FC<{ toggleMobileMenu: () => void }> = ({ toggleMobil
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <div className="text-sm font-medium text-white">
-                {isConnected ? address : ''}
-              </div>
-              <div className="text-xs text-text-tertiary">{isConnected ? 'Connected' : ''}</div>
-            </div>
             <ConnectButton chainStatus="none" showBalance={false} />
           </div>
         </div>

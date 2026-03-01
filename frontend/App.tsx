@@ -1,28 +1,34 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
+import { useStore } from './store/useStore';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './pages/Dashboard';
-import { Wallets } from './pages/Wallets';
-import { Bridge } from './pages/Bridge';
-import { Passport } from './pages/Passport';
+import { Portfolio } from './pages/Portfolio';
 import { Marketplace } from './pages/Marketplace';
+import { Staking } from './pages/Staking';
+import { Governance } from './pages/Governance';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { Docs } from './pages/Docs';
-import { WalletSync } from './components/system/WalletSync';
 
 function App() {
+  const { address, isConnected } = useAccount();
+  const { setWalletStatus } = useStore();
+
+  useEffect(() => {
+    setWalletStatus(isConnected, address);
+  }, [isConnected, address, setWalletStatus]);
+
   return (
     <HashRouter>
       <Layout>
-        <WalletSync />
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/wallets" element={<Wallets />} />
-          <Route path="/bridge" element={<Bridge />} />
+          <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/staking" element={<Staking />} />
+          <Route path="/governance" element={<Governance />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/passport" element={<Passport />} />
           <Route path="/docs" element={<Docs />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

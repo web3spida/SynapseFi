@@ -8,8 +8,8 @@ export const AdminDashboard: React.FC = () => {
   const { rwaAssets, approveAsset, rejectAsset, updateAssetPrice } = useStore();
   const [filter, setFilter] = useState<string>('All');
   const [search, setSearch] = useState<string>('');
-  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
-  const [newPrice, setNewPrice] = useState<string>('');
+  const [editingApyId, setEditingApyId] = useState<string | null>(null);
+  const [newApy, setNewApy] = useState<string>('');
 
   const filteredAssets = rwaAssets.filter(asset => {
     const matchesFilter = filter === 'All' || asset.status === filter;
@@ -17,11 +17,11 @@ export const AdminDashboard: React.FC = () => {
     return matchesFilter && matchesSearch;
   });
 
-  const handleUpdatePrice = (id: string) => {
-    if (newPrice) {
-      updateAssetPrice(id, Number(newPrice));
-      setEditingPriceId(null);
-      setNewPrice('');
+  const handleUpdateApy = (id: string) => {
+    if (newApy) {
+      updateAssetPrice(id, Number(newApy));
+      setEditingApyId(null);
+      setNewApy('');
     }
   };
 
@@ -151,20 +151,20 @@ export const AdminDashboard: React.FC = () => {
                       )}
                     </td>
                     <td className="p-4">
-                      {editingPriceId === asset.id ? (
+                      {editingApyId === asset.id ? (
                         <div className="flex items-center gap-2">
                           <input 
                             type="number" 
                             className="w-16 bg-bg-primary border border-white/10 rounded px-2 py-1 text-sm text-white"
                             placeholder={String(asset.apy)}
-                            value={newPrice}
-                            onChange={(e) => setNewPrice(e.target.value)}
+                            value={newApy}
+                            onChange={(e) => setNewApy(e.target.value)}
                             autoFocus
                           />
-                          <button onClick={() => handleUpdatePrice(asset.id)} className="text-green-400 hover:text-green-300">
+                          <button onClick={() => handleUpdateApy(asset.id)} className="text-green-400 hover:text-green-300">
                             <Check size={16} />
                           </button>
-                          <button onClick={() => setEditingPriceId(null)} className="text-red-400 hover:text-red-300">
+                          <button onClick={() => setEditingApyId(null)} className="text-red-400 hover:text-red-300">
                             <X size={16} />
                           </button>
                         </div>
@@ -173,8 +173,9 @@ export const AdminDashboard: React.FC = () => {
                           {asset.apy}%
                           {asset.status === 'Active' && (
                              <button 
-                                onClick={() => { setEditingPriceId(asset.id); setNewPrice(String(asset.apy)); }}
+                                onClick={() => { setEditingApyId(asset.id); setNewApy(String(asset.apy)); }}
                                 className="text-text-tertiary hover:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Update APY"
                              >
                                <Edit size={14} />
                              </button>

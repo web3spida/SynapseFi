@@ -5,16 +5,24 @@ import { Button } from '../components/ui/Button';
 import { Search, Filter, TrendingUp, ShieldCheck, PieChart, Info, ArrowUpRight, Plus, UserCog, Check, X, FileText } from 'lucide-react';
 import { RWAAsset } from '../types';
 import { AssetProposalModal } from '../components/marketplace/AssetProposalModal';
+import { InvestModal } from '../components/marketplace/InvestModal';
 
 export const Marketplace: React.FC = () => {
-  const { rwaAssets, userRole, setUserRole, approveAsset, rejectAsset, updateAssetPrice, rwaOnchainPrices, loadOnchainRwaPrices } = useStore();
+  const { rwaAssets, userRole, setUserRole, approveAsset, rejectAsset, updateAssetPrice, rwaOnchainPrices, loadOnchainRwaPrices, investInAsset } = useStore();
   const [filter, setFilter] = useState<string>('All');
   const [search, setSearch] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<RWAAsset | null>(null);
 
   useEffect(() => {
     loadOnchainRwaPrices();
   }, [loadOnchainRwaPrices]);
+
+  const openInvestModal = (asset: RWAAsset) => {
+    setSelectedAsset(asset);
+    setIsInvestModalOpen(true);
+  };
 
   // Filter logic based on role and status
   const filteredAssets = rwaAssets.filter(asset => {
@@ -59,6 +67,11 @@ export const Marketplace: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       <AssetProposalModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <InvestModal 
+        isOpen={isInvestModalOpen} 
+        onClose={() => setIsInvestModalOpen(false)} 
+        asset={selectedAsset} 
+      />
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -242,6 +255,7 @@ export const Marketplace: React.FC = () => {
                     fullWidth 
                     variant={asset.status === 'Coming Soon' || asset.status === 'Pending Approval' ? 'secondary' : 'primary'}
                     disabled={asset.status === 'Coming Soon' || asset.status === 'Pending Approval'}
+                    onClick={() => asset.status === 'Active' && openInvestModal(asset)}
                   >
                     {asset.status === 'Coming Soon' ? 'Notify Me' : 
                      asset.status === 'Pending Approval' ? 'Under Review' : 'Invest Now'}

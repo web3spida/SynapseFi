@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, Wallet, ArrowLeftRight, CreditCard, ExternalLink, HelpCircle, Building2, Shield } from 'lucide-react';
+import { LayoutDashboard, Building2, Shield, Briefcase, Coins, Vote, BookOpen, HelpCircle, ExternalLink } from 'lucide-react';
 import { NAVIGATION_ITEMS } from '../../constants';
 import { useStore } from '../../store/useStore';
 
@@ -10,11 +10,12 @@ export const Sidebar: React.FC = () => {
 
   const iconMap: Record<string, React.ReactNode> = {
     LayoutDashboard: <LayoutDashboard size={20} />,
-    Wallet: <Wallet size={20} />,
-    ArrowLeftRight: <ArrowLeftRight size={20} />,
+    Briefcase: <Briefcase size={20} />,
     Building2: <Building2 size={20} />,
-    CreditCard: <CreditCard size={20} />,
+    Coins: <Coins size={20} />,
+    Vote: <Vote size={20} />,
     Shield: <Shield size={20} />,
+    BookOpen: <BookOpen size={20} />,
   };
 
   const filteredNavItems = NAVIGATION_ITEMS.filter(item => {

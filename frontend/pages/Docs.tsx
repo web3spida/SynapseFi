@@ -2,18 +2,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '../components/ui/Card';
-import { Book, Shield, Zap, ArrowLeftRight, CreditCard, ChevronRight, Info } from 'lucide-react';
+import { Book, Shield, Zap, TrendingUp, Landmark, Scale, FileText, ChevronRight, Info, Building, Banknote, Briefcase } from 'lucide-react';
 
-type DocSection = 'intro' | 'score' | 'passport' | 'bridge';
+type DocSection = 'intro' | 'assets' | 'process' | 'legal';
 
 export const Docs: React.FC = () => {
   const [activeSection, setActiveSection] = useState<DocSection>('intro');
 
   const menuItems = [
     { id: 'intro', label: 'Introduction', icon: Book },
-    { id: 'score', label: 'Credit Scoring Model', icon: Zap },
-    { id: 'passport', label: 'Credit Passport NFT', icon: Shield },
-    { id: 'bridge', label: 'Cross-Chain Bridge', icon: ArrowLeftRight },
+    { id: 'assets', label: 'Asset Classes', icon: Building },
+    { id: 'process', label: 'Investment Process', icon: TrendingUp },
+    { id: 'legal', label: 'Legal & Compliance', icon: Scale },
   ];
 
   const renderContent = () => {
@@ -22,11 +22,10 @@ export const Docs: React.FC = () => {
         return (
           <div className="space-y-8 animate-fadeIn">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-4">Introduction to SynapseFi</h1>
+              <h1 className="text-3xl font-bold text-white mb-4">Introduction to SynapseFi RWA</h1>
               <p className="text-text-secondary text-lg leading-relaxed">
-                SynapseFi is a decentralized credit intelligence platform built on the Polygon network. 
-                We aggregate on-chain data across multiple wallets to generate a comprehensive credit score, 
-                enabling users to access under-collateralized loans and premium DeFi rates.
+                SynapseFi is a premier decentralized platform for tokenized Real World Assets (RWAs). 
+                We bridge the gap between traditional finance and DeFi by bringing high-quality, institutional-grade assets on-chain.
               </p>
             </div>
 
@@ -34,31 +33,31 @@ export const Docs: React.FC = () => {
               <Card className="p-6 bg-gradient-to-br from-purple-900/10 to-transparent border-purple-500/20">
                 <h3 className="font-bold text-white mb-2 flex items-center gap-2">
                   <Shield className="text-purple-400" size={20} />
-                  Privacy First
+                  Secure & Compliant
                 </h3>
                 <p className="text-sm text-text-secondary">
-                  Your data never leaves the chain. We use Zero-Knowledge proofs to verify creditworthiness without exposing transaction details.
+                  Fully regulated environment with KYC/AML integration and legal recourse for all asset classes.
                 </p>
               </Card>
               <Card className="p-6 bg-gradient-to-br from-blue-900/10 to-transparent border-blue-500/20">
                 <h3 className="font-bold text-white mb-2 flex items-center gap-2">
-                  <ArrowLeftRight className="text-blue-400" size={20} />
-                  Multi-Chain
+                  <Zap className="text-blue-400" size={20} />
+                  Instant Liquidity
                 </h3>
                 <p className="text-sm text-text-secondary">
-                  Native support for Polygon PoS and zkEVM, with seamless bridging and unified scoring across networks.
+                  Trade asset tokens 24/7 on our secondary market or use them as collateral in DeFi protocols.
                 </p>
               </Card>
             </div>
 
             <div className="bg-bg-tertiary/50 p-6 rounded-xl border border-white/5">
-              <h3 className="text-lg font-semibold text-white mb-3">Core Features</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Why Tokenize RWAs?</h3>
               <ul className="space-y-3">
                 {[
-                  "Multi-wallet identity aggregation",
-                  "Real-time credit scoring updates",
-                  "Soulbound NFT Passport (SBT)",
-                  "Gas-efficient bridging infrastructure"
+                  "Fractional ownership of high-value assets",
+                  "Automated yield distribution via smart contracts",
+                  "Transparent provenance and audit trails",
+                  "Reduced intermediaries and settlement times"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-text-secondary">
                     <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
@@ -70,121 +69,105 @@ export const Docs: React.FC = () => {
           </div>
         );
 
-      case 'score':
+      case 'assets':
         return (
           <div className="space-y-8 animate-fadeIn">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-4">The Credit Scoring Model</h1>
+              <h1 className="text-3xl font-bold text-white mb-4">Supported Asset Classes</h1>
               <p className="text-text-secondary text-lg leading-relaxed mb-6">
-                Your SynapseFi score (0-850) is calculated dynamically based on your on-chain behavior. 
-                We analyze four key dimensions to determine your creditworthiness.
+                Our platform supports a diverse range of asset classes, allowing investors to build a balanced and resilient portfolio.
               </p>
             </div>
 
             <div className="space-y-6">
-              <div className="bg-bg-secondary/50 rounded-xl p-6 border border-white/5">
-                <h3 className="text-xl font-bold text-white mb-4">Scoring Factors</h3>
-                <div className="space-y-6">
-                  {[
-                    { title: "Wallet Age & Activity (35%)", desc: "Duration of active usage and frequency of transactions over time." },
-                    { title: "Liquidity & Assets (30%)", desc: "Average daily balance across stablecoins and blue-chip assets." },
-                    { title: "DeFi Interaction (20%)", desc: "History of loan repayments and interactions with trusted protocols (Aave, Uniswap)." },
-                    { title: "Liquidation History (15%)", desc: "Frequency of liquidations. Fewer liquidations result in a higher score." }
-                  ].map((factor, i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="text-2xl font-bold text-purple-500/50">0{i + 1}</div>
-                      <div>
-                        <h4 className="font-bold text-white">{factor.title}</h4>
-                        <p className="text-sm text-text-secondary mt-1">{factor.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                    { title: "Real Estate", icon: Building, desc: "Commercial and residential properties generating rental yield." },
+                    { title: "Private Credit", icon: Banknote, desc: "Short-term loans to established businesses with collateral backing." },
+                    { title: "Government Bonds", icon: Landmark, desc: "Tokenized US Treasury Bills and other sovereign debt." },
+                    { title: "Private Equity", icon: Briefcase, desc: "Shares in pre-IPO companies and growth-stage startups." }
+                ].map((asset, i) => (
+                    <Card key={i} className="p-6 hover:border-purple-500/30 transition-colors">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="p-2 bg-white/5 rounded-lg">
+                                <asset.icon size={24} className="text-purple-400" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white">{asset.title}</h3>
+                        </div>
+                        <p className="text-text-secondary text-sm">{asset.desc}</p>
+                    </Card>
+                ))}
               </div>
 
               <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-3">
                 <Info className="text-blue-400 shrink-0 mt-0.5" size={20} />
                 <div className="text-sm text-blue-100">
-                  <span className="font-bold">Pro Tip:</span> Linking multiple wallets helps build a more complete profile, often resulting in a score increase of 20-50 points.
+                  <span className="font-bold">Diversification Strategy:</span> Combining low-risk Bonds with high-yield Private Credit can optimize your risk-adjusted returns.
                 </div>
               </div>
             </div>
           </div>
         );
 
-      case 'passport':
+      case 'process':
         return (
           <div className="space-y-8 animate-fadeIn">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-4">Credit Passport NFT</h1>
+              <h1 className="text-3xl font-bold text-white mb-4">Investment Process</h1>
               <p className="text-text-secondary text-lg leading-relaxed">
-                The SynapseFi Passport is a Soulbound Token (SBT) that acts as your portable on-chain identity. 
-                It stores your credit metadata and allows third-party dApps to verify your reputation without re-calculating it.
+                Investing in RWAs on SynapseFi is streamlined and secure. Follow these steps to start building your portfolio.
               </p>
             </div>
 
-            <Card className="p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Passport Tiers</h3>
-              <div className="grid gap-4">
-                {[
-                  { tier: "Gold", score: "750+", perk: "Zero-collateral loans up to $5k" },
-                  { tier: "Silver", score: "650-749", perk: "50% LTV reduction on Aave" },
-                  { tier: "Bronze", score: "0-649", perk: "Standard DeFi access" }
-                ].map((t) => (
-                  <div key={t.tier} className="flex items-center justify-between p-4 bg-bg-primary rounded-lg border border-white/5">
-                    <div className="flex items-center gap-3">
-                      <CreditCard className={
-                        t.tier === 'Gold' ? 'text-yellow-400' : 
-                        t.tier === 'Silver' ? 'text-gray-300' : 'text-orange-700'
-                      } />
-                      <div>
-                        <span className="font-bold text-white">{t.tier}</span>
-                        <span className="text-xs text-text-tertiary ml-2">({t.score})</span>
-                      </div>
-                    </div>
-                    <span className="text-sm text-text-secondary">{t.perk}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <div className="space-y-0 relative border-l border-purple-500/30 ml-3">
+              {[
+                { title: "Complete KYC/KYB", desc: "Verify your identity or business entity to comply with regulations." },
+                { title: "Connect Wallet", desc: "Link your Web3 wallet (MetaMask, WalletConnect) to the platform." },
+                { title: "Browse Marketplace", desc: "Explore available assets, review documents, and analyze yields." },
+                { title: "Invest USDC", desc: "Select an asset and invest USDC. Smart contracts mint asset tokens to your wallet." },
+                { title: "Earn & Track", desc: "Receive yield distributions automatically and track performance in your Portfolio." }
+              ].map((step, i) => (
+                <div key={i} className="pl-8 pb-8 relative">
+                  <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                  <h4 className="font-bold text-white text-lg mb-1">{step.title}</h4>
+                  <p className="text-text-secondary text-sm">{step.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         );
 
-      case 'bridge':
+      case 'legal':
         return (
           <div className="space-y-8 animate-fadeIn">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-4">Cross-Chain Bridge</h1>
+              <h1 className="text-3xl font-bold text-white mb-4">Legal & Compliance</h1>
               <p className="text-text-secondary text-lg leading-relaxed">
-                Our bridge utilizes the official Polygon LxLy infrastructure to move assets securely between Polygon PoS and Polygon zkEVM.
+                We utilize a robust legal framework to ensure that on-chain tokens represent legally enforceable ownership rights in the real world.
               </p>
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-white">How to Bridge</h3>
-              <div className="space-y-0 relative border-l border-purple-500/30 ml-3">
-                {[
-                  "Select the source and destination chains.",
-                  "Choose the asset (USDC, MATIC, WETH) and amount.",
-                  "Approve the token spend allowance (1st transaction).",
-                  "Confirm the deposit transaction (2nd transaction).",
-                  "Wait ~15-20 mins for the zk-proof finality."
-                ].map((step, i) => (
-                  <div key={i} className="pl-8 pb-8 relative">
-                    <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-purple-500"></div>
-                    <h4 className="font-bold text-white text-sm mb-1">Step {i + 1}</h4>
-                    <p className="text-text-secondary text-sm">{step}</p>
-                  </div>
-                ))}
+              <h3 className="text-xl font-bold text-white">The SPV Structure</h3>
+              <p className="text-text-secondary">
+                  Each asset or pool of assets is held by a Special Purpose Vehicle (SPV). The SPV issues tokens that represent shares or debt instruments of that entity.
+              </p>
+              
+              <div className="grid gap-4 mt-6">
+                 {[
+                     { title: "Bankruptcy Remote", desc: "Assets are isolated from SynapseFi's corporate balance sheet." },
+                     { title: "Legal Recourse", desc: "Token holders have legal rights to the underlying assets." },
+                     { title: "Regular Audits", desc: "Third-party firms audit both the smart contracts and the off-chain assets." }
+                 ].map((item, i) => (
+                     <div key={i} className="flex items-start gap-4 p-4 bg-bg-primary rounded-lg border border-white/5">
+                         <Scale className="text-green-400 shrink-0 mt-1" size={20} />
+                         <div>
+                             <h4 className="font-bold text-white">{item.title}</h4>
+                             <p className="text-sm text-text-secondary mt-1">{item.desc}</p>
+                         </div>
+                     </div>
+                 ))}
               </div>
-            </div>
-
-            <div className="p-6 bg-black rounded-xl border border-white/10 font-mono text-sm overflow-x-auto">
-              <div className="text-gray-500 mb-2">// Example: Checking Bridge Status via SDK</div>
-              <div className="text-purple-400">const<span className="text-white"> status </span>=<span className="text-blue-400"> await</span><span className="text-white"> bridge.</span><span className="text-yellow-300">getStatus</span><span className="text-white">({'{'}</span></div>
-              <div className="pl-4 text-white">txHash: <span className="text-green-400">'0x123...abc'</span>,</div>
-              <div className="pl-4 text-white">network: <span className="text-green-400">'zkEVM'</span></div>
-              <div className="text-white">{'}'});</div>
             </div>
           </div>
         );
